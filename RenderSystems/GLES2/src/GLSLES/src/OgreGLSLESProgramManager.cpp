@@ -35,7 +35,6 @@ THE SOFTWARE.
 #include "OgreGLSLESProgram.h"
 
 #include "OgreGLSLESLinkProgram.h"
-#include "OgreGLSLESProgramPipeline.h"
 
 #include "OgreRoot.h"
 
@@ -105,15 +104,7 @@ namespace Ogre {
             // Program object not found for key so need to create it
             if (programFound == mPrograms.end())
             {
-                if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(
-                        RSC_SEPARATE_SHADER_OBJECTS))
-                {
-                    mActiveProgram = new GLSLESProgramPipeline(mActiveShader);
-                }
-                else
-                {
-                    mActiveProgram = new GLSLESLinkProgram(mActiveShader);
-                }
+                mActiveProgram = new GLSLESLinkProgram(mActiveShader);
 
                 mPrograms[activeKey] = mActiveProgram;
             }

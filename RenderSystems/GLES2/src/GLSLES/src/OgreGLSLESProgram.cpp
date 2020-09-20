@@ -117,7 +117,6 @@ namespace Ogre {
             if( mType == GPT_VERTEX_PROGRAM )
                 GLSLESProgramCommon::bindFixedAttributes( mGLProgramHandle );
 
-            OGRE_CHECK_GL_ERROR(glProgramParameteriEXT(mGLProgramHandle, GL_PROGRAM_SEPARABLE_EXT, GL_TRUE));
             attachToProgramObject(mGLProgramHandle);
             OGRE_CHECK_GL_ERROR(glLinkProgram(mGLProgramHandle));
             OGRE_CHECK_GL_ERROR(glGetProgramiv(mGLProgramHandle, GL_LINK_STATUS, &mLinked));
@@ -148,17 +147,6 @@ namespace Ogre {
                 shaderType = GL_FRAGMENT_SHADER;
             }
             OGRE_CHECK_GL_ERROR(mGLShaderHandle = glCreateShader(shaderType));
-
-            if(caps->hasCapability(RSC_DEBUG))
-            {
-                glLabelObjectEXT(GL_SHADER_OBJECT_EXT, mGLShaderHandle, 0, mName.c_str());
-            }
-
-            // also create program object
-            if (caps->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
-            {
-                OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
-            }
         }
 
         // Add preprocessor extras and main source
@@ -204,7 +192,7 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glCompileShader(mGLShaderHandle));
 
         // Check for compile errors
-        int compiled;
+        int compiled = 0;
         OGRE_CHECK_GL_ERROR(glGetShaderiv(mGLShaderHandle, GL_COMPILE_STATUS, &compiled));
 
         String compileInfo = GLSLES::getObjectInfo(mGLShaderHandle);
@@ -225,11 +213,6 @@ namespace Ogre {
         {
             OGRE_CHECK_GL_ERROR(glDeleteShader(mGLShaderHandle));
 
-            if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
-            {
-                OGRE_CHECK_GL_ERROR(glDeleteProgram(mGLProgramHandle));
-            }
-            
             mGLShaderHandle = 0;
             mGLProgramHandle = 0;
             mCompiled = 0;
@@ -246,10 +229,6 @@ namespace Ogre {
 //                                                  " and program " + StringConverter::toString(mGLProgramHandle));
             OGRE_CHECK_GL_ERROR(glDeleteShader(mGLShaderHandle));
 
-            if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
-            {
-                OGRE_CHECK_GL_ERROR(glDeleteProgram(mGLProgramHandle));
-            }
             // destroy all programs using this shader
             GLSLESProgramManager::getSingletonPtr()->destroyAllByShader(this);
 

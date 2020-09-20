@@ -332,6 +332,11 @@ namespace Ogre {
             NameValuePairList::const_iterator opt;
             NameValuePairList::const_iterator end = miscParams->end();
 
+            if ((opt = miscParams->find("externalWindowHandle")) != end)
+            {
+                mWindow = (HWND)StringConverter::parseSizeT(opt->second);
+            }
+
             if ((opt = miscParams->find("currentGLContext")) != end &&
                 StringConverter::parseBool(opt->second))
             {
@@ -389,27 +394,18 @@ namespace Ogre {
             }
         }
 
-        if (mEglSurface)
+        initNativeCreatedWindow(miscParams);
+
+        if (mWindow)
         {
-            mEglConfig = mGLSupport->getGLConfigFromDrawable (mEglSurface, &width, &height);
+          mEglDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+          eglInitialize(mEglDisplay, NULL, NULL);
+
+          eglBindAPI(EGL_OPENGL_ES_API);
+
+          mGLSupport->setGLDisplay(mEglDisplay);
+          mIsExternal = true;
         }
-
-        if (!mEglConfig && eglContext)
-        {
-            mEglConfig = mGLSupport->getGLConfigFromContext(eglContext);
-
-            if (!mEglConfig)
-            {
-                // This should never happen.
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                            "Unexpected failure to determine a EGLFBConfig",
-                            "EGLWindow::create");
-            }
-        }
-
-        mIsExternal = (mEglSurface != 0);
-
-
 
         if (!mEglConfig)
         {
@@ -447,6 +443,8 @@ namespace Ogre {
         if (!mIsExternal)
         {
             createNativeWindow(left, top, width, height, title);
+        } else {
+            mEglSurface = createSurfaceFromWindow(mEglDisplay, mWindow);
         }
 
         mContext = createEGLContext(eglContext);

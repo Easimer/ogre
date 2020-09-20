@@ -68,61 +68,11 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     bool GLSLESProgramCommon::getMicrocodeFromCache(uint32 id, GLuint programHandle)
     {
-        if (!GpuProgramManager::canGetCompiledShaderBuffer())
-            return false;
-
-        if (!GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(id))
-            return false;
-
-        GpuProgramManager::Microcode cacheMicrocode = GpuProgramManager::getSingleton().getMicrocodeFromCache(id);
-
-        // turns out we need this param when loading
-        GLenum binaryFormat = 0;
-
-        cacheMicrocode->seek(0);
-
-        // get size of binary
-        cacheMicrocode->read(&binaryFormat, sizeof(GLenum));
-
-        if(!Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER))
-            return false;
-
-        GLint binaryLength = static_cast<GLint>(cacheMicrocode->size() - sizeof(GLenum));
-
-        // load binary
-        OGRE_CHECK_GL_ERROR(glProgramBinaryOES(programHandle,
-                           binaryFormat,
-                           cacheMicrocode->getCurrentPtr(),
-                           binaryLength));
-
-        GLint success = 0;
-        OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_LINK_STATUS, &success));
-
-        return success;
+        return false;
     }
     void GLSLESProgramCommon::_writeToCache(uint32 id, GLuint programHandle)
     {
-        if(!GpuProgramManager::canGetCompiledShaderBuffer())
-            return;
-
-        if(!GpuProgramManager::getSingleton().getSaveMicrocodesToCache())
-            return;
-
-        // Add to the microcode to the cache
-        // Get buffer size
-        GLint binaryLength = 0;
-        OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_PROGRAM_BINARY_LENGTH_OES, &binaryLength));
-
-        // Create microcode
-        GpuProgramManager::Microcode newMicrocode =
-            GpuProgramManager::getSingleton().createMicrocode(static_cast<uint32>(binaryLength + sizeof(GLenum)));
-
-        // Get binary
-        OGRE_CHECK_GL_ERROR(glGetProgramBinaryOES(programHandle, binaryLength, NULL, (GLenum *)newMicrocode->getPtr(),
-                                                  newMicrocode->getPtr() + sizeof(GLenum)));
-
-        // Add to the microcode to the cache
-        GpuProgramManager::getSingleton().addMicrocodeToCache(id, newMicrocode);
+        return;
     }
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN

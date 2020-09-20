@@ -159,7 +159,7 @@ namespace Ogre {
         if(getGLES2RenderSystem()->hasMinGLVersion(3, 0))
         {
             // Check samples supported
-            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_SAMPLES_APPLE, &mMaxFSAASamples));
+            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_SAMPLES_EXT, &mMaxFSAASamples));
         }
     }
 

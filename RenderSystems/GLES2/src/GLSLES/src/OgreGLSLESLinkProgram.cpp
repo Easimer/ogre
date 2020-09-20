@@ -137,12 +137,7 @@ namespace Ogre {
 
         const RenderSystemCapabilities* caps = Root::getSingleton().getRenderSystem()->getCapabilities();
 
-        if(caps->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
-        {
-            if(glIsProgramPipelineEXT(mGLProgramHandle))
-                glValidateProgramPipelineEXT(mGLProgramHandle);
-        }
-        else if(glIsProgram(mGLProgramHandle))
+        if(glIsProgram(mGLProgramHandle))
         {
             glValidateProgram(mGLProgramHandle);
         }
