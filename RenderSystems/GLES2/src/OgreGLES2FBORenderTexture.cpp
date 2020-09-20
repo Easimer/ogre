@@ -38,7 +38,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-//-----------------------------------------------------------------------------    
+//-----------------------------------------------------------------------------
     GLES2FBORenderTexture::GLES2FBORenderTexture(GLES2FBOManager *manager, const String &name,
         const GLSurfaceDesc &target, bool writeGamma, uint fsaa):
         GLRenderTexture(name, target, writeGamma, std::min(manager->getMaxFSAASamples(), (int)fsaa)),
@@ -51,7 +51,7 @@ namespace Ogre {
         mWidth = mFB.getWidth();
         mHeight = mFB.getHeight();
     }
-    
+
     void GLES2FBORenderTexture::getCustomAttribute(const String& name, void* pData)
     {
         if(name == GLRenderTexture::CustomAttributeString_FBO)
@@ -68,25 +68,25 @@ namespace Ogre {
     {
         mFB.swapBuffers();
     }
-    
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
     void GLES2FBORenderTexture::notifyOnContextLost()
     {
         mFB.notifyOnContextLost();
     }
-    
+
     void GLES2FBORenderTexture::notifyOnContextReset()
     {
         GLSurfaceDesc target;
         target.buffer = static_cast<GLHardwarePixelBufferCommon*>(mBuffer);
         target.zoffset = mZOffset;
-        
+
         mFB.notifyOnContextReset(target);
-        
+
         static_cast<GLES2RenderSystem*>(Ogre::Root::getSingletonPtr()->getRenderSystem())->_createDepthBufferFor(this);
     }
 #endif
-    
+
     //-----------------------------------------------------------------------------
     bool GLES2FBORenderTexture::attachDepthBuffer( DepthBuffer *depthBuffer )
     {
@@ -108,7 +108,7 @@ namespace Ogre {
         mFB.detachDepthBuffer();
         GLRenderTexture::_detachDepthBuffer();
     }
-   
+
     // Size of probe texture
     #define PROBE_SIZE 16
 
@@ -134,32 +134,40 @@ namespace Ogre {
         GL_NONE,
         GL_DEPTH_COMPONENT16
         , GL_DEPTH_COMPONENT24_OES   // Prefer 24 bit depth
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE
         , GL_DEPTH_COMPONENT32_OES
+#endif
         , GL_DEPTH24_STENCIL8_OES    // Packed depth / stencil
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE
         , GL_DEPTH32F_STENCIL8
+#endif
     };
     static const uchar depthBits[] =
     {
         0
         ,16
         ,24
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE
         ,32
+#endif
         ,24
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE
         ,32
+#endif
     };
     #define DEPTHFORMAT_COUNT (sizeof(depthFormats)/sizeof(GLenum))
 
     GLES2FBOManager::GLES2FBOManager() : mMaxFSAASamples(0)
     {
         detectFBOFormats();
-        
+
         OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mTempFBO));
 
         // Check multisampling if supported
         if(getGLES2RenderSystem()->hasMinGLVersion(3, 0))
         {
             // Check samples supported
-            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_SAMPLES_APPLE, &mMaxFSAASamples));
+            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_SAMPLES_EXT, &mMaxFSAASamples));
         }
     }
 
@@ -169,14 +177,14 @@ namespace Ogre {
         {
             LogManager::getSingleton().logWarning("GLES2FBOManager destructor called, but not all renderbuffers were released.");
         }
-        
+
         OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &mTempFBO));
     }
-    
+
     void GLES2FBOManager::_reload()
     {
         OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &mTempFBO));
-        
+
         detectFBOFormats();
 
         OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mTempFBO));
@@ -242,7 +250,7 @@ namespace Ogre {
             glBindRenderbuffer(GL_RENDERBUFFER, stencilRB);
 
             // Allocate storage for stencil buffer
-            glRenderbufferStorage(GL_RENDERBUFFER, stencilFormat, PROBE_SIZE, PROBE_SIZE); 
+            glRenderbufferStorage(GL_RENDERBUFFER, stencilFormat, PROBE_SIZE, PROBE_SIZE);
 
             // Attach stencil
             glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
@@ -262,10 +270,10 @@ namespace Ogre {
 
         if (stencilRB)
             glDeleteRenderbuffers(1, &stencilRB);
-        
+
         return status == GL_FRAMEBUFFER_COMPLETE;
     }
-    
+
     /** Try a certain packed depth/stencil format, and return the status.
         @returns true    if this combo is supported
                  false   if this combo is not supported
@@ -309,7 +317,7 @@ namespace Ogre {
     {
         GLES2RenderSystem* rs = getGLES2RenderSystem();
         bool hasGLES3 = rs->hasMinGLVersion(3, 0);
-#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+#if 0
         memset(mProps, 0, sizeof(mProps));
 
         // TODO: Fix that probing all formats slows down startup not just on the web also on Android / iOS
@@ -362,7 +370,7 @@ namespace Ogre {
             {
                 mProps[x].valid = true;
                 StringStream str;
-                str << "FBO " << PixelUtil::getFormatName((PixelFormat)x) 
+                str << "FBO " << PixelUtil::getFormatName((PixelFormat)x)
                     << " depth/stencil support: ";
 
                 // For each depth/stencil formats
@@ -375,8 +383,8 @@ namespace Ogre {
                         for (uchar stencil = 0; stencil < STENCILFORMAT_COUNT; stencil += stencilStep)
                         {
 //                            StringStream l;
-//                            l << "Trying " << PixelUtil::getFormatName((PixelFormat)x) 
-//                              << " D" << depthBits[depth] 
+//                            l << "Trying " << PixelUtil::getFormatName((PixelFormat)x)
+//                              << " D" << depthBits[depth]
 //                              << "S" << stencilBits[stencil];
 //                            LogManager::getSingleton().logMessage(l.str());
 
@@ -429,7 +437,7 @@ namespace Ogre {
             // Delete texture and framebuffer
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
             glDeleteFramebuffers(1, &fb);
-            
+
             if (internalFormat != GL_NONE)
             {
                 glDeleteTextures(1, &tid);
@@ -484,7 +492,7 @@ namespace Ogre {
             if(depthFormats[props.modes[mode].depth] == GL_DEPTH32F_STENCIL8) // Prefer 32F/8 packed
                 desirability += 5000;
             desirability += stencilBits[props.modes[mode].stencil] + depthBits[props.modes[mode].depth];
-            
+
             if(desirability > bestscore)
             {
                 bestscore = desirability;
@@ -495,7 +503,7 @@ namespace Ogre {
         *stencilFormat = requestDepthOnly ? 0 : stencilFormats[props.modes[bestmode].stencil];
     }
 
-    GLES2FBORenderTexture *GLES2FBOManager::createRenderTexture(const String &name, 
+    GLES2FBORenderTexture *GLES2FBOManager::createRenderTexture(const String &name,
         const GLSurfaceDesc &target, bool writeGamma, uint fsaa)
     {
         GLES2FBORenderTexture *retval = new GLES2FBORenderTexture(this, name, target, writeGamma, fsaa);
@@ -517,7 +525,7 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mainfbo));
         }
     }
-    
+
     GLSurfaceDesc GLES2FBOManager::requestRenderBuffer(GLenum format, uint32 width, uint32 height, uint fsaa)
     {
         GLSurfaceDesc retval;

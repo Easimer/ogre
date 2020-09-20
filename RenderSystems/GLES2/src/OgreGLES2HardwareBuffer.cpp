@@ -102,7 +102,7 @@ namespace Ogre {
             else
                 access = GL_MAP_READ_BIT_EXT | GL_MAP_WRITE_BIT_EXT;
 
-            OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRangeEXT(mTarget, offset, length, access));
+            OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRange(mTarget, offset, length, access));
         }
 
         if (!pBuffer)
@@ -121,7 +121,7 @@ namespace Ogre {
 
         if(mRenderSystem->getCapabilities()->hasCapability(RSC_MAPBUFFER)) {
             GLboolean mapped;
-            OGRE_CHECK_GL_ERROR(mapped = glUnmapBufferOES(mTarget));
+            OGRE_CHECK_GL_ERROR(mapped = glUnmapBuffer(mTarget));
             if(!mapped)
             {
                 OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Buffer data corrupted, please reload",
@@ -144,12 +144,12 @@ namespace Ogre {
         mRenderSystem->_getStateCacheManager()->bindGLBuffer(mTarget, mBufferId);
         // Map the buffer range then copy out of it into our destination buffer
         void* srcData;
-        OGRE_CHECK_GL_ERROR(srcData = glMapBufferRangeEXT(mTarget, offset, length, GL_MAP_READ_BIT_EXT));
+        OGRE_CHECK_GL_ERROR(srcData = glMapBufferRange(mTarget, offset, length, GL_MAP_READ_BIT_EXT));
         memcpy(pDest, srcData, length);
 
         // Unmap the buffer since we are done.
         GLboolean mapped;
-        OGRE_CHECK_GL_ERROR(mapped = glUnmapBufferOES(mTarget));
+        OGRE_CHECK_GL_ERROR(mapped = glUnmapBuffer(mTarget));
         if(!mapped)
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Buffer data corrupted, please reload",

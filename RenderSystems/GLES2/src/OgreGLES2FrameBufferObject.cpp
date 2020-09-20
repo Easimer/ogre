@@ -210,7 +210,7 @@ namespace Ogre {
             }
 
             // Drawbuffer extension supported, use it
-            OGRE_CHECK_GL_ERROR(glDrawBuffers(n, bufs));
+			OGRE_CHECK_GL_ERROR(glDrawBuffersEXT(n, bufs));
         }
         // Check status
         GLuint status;
@@ -297,7 +297,7 @@ namespace Ogre {
             uint32 height = mColour[0].buffer->getHeight();
             OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_READ_FRAMEBUFFER, mMultisampleFB));
             OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mFB));
-            OGRE_CHECK_GL_ERROR(glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST));
+            OGRE_CHECK_GL_ERROR(glBlitFramebufferCHROMIUM(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST));
             // Unbind
             OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, oldfb));
         }

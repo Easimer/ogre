@@ -46,7 +46,7 @@ namespace Ogre {
 #endif
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
-    GLSLESProgram::GLSLESProgram(ResourceManager* creator, 
+    GLSLESProgram::GLSLESProgram(ResourceManager* creator,
         const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader)
         : GLSLShaderCommon(creator, name, handle, group, isManual, loader)
@@ -60,7 +60,7 @@ namespace Ogre {
             setupBaseParamDictionary();
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
             ParamDictionary* dict = getParamDictionary();
-            dict->addParameter(ParameterDef("use_optimiser", 
+            dict->addParameter(ParameterDef("use_optimiser",
                                             "Should the GLSL optimiser be used. Default is false.",
                                             PT_BOOL),&msCmdOptimisation);
 #endif
@@ -117,7 +117,6 @@ namespace Ogre {
             if( mType == GPT_VERTEX_PROGRAM )
                 GLSLESProgramCommon::bindFixedAttributes( mGLProgramHandle );
 
-            OGRE_CHECK_GL_ERROR(glProgramParameteriEXT(mGLProgramHandle, GL_PROGRAM_SEPARABLE_EXT, GL_TRUE));
             attachToProgramObject(mGLProgramHandle);
             OGRE_CHECK_GL_ERROR(glLinkProgram(mGLProgramHandle));
             OGRE_CHECK_GL_ERROR(glGetProgramiv(mGLProgramHandle, GL_LINK_STATUS, &mLinked));
@@ -148,17 +147,6 @@ namespace Ogre {
                 shaderType = GL_FRAGMENT_SHADER;
             }
             OGRE_CHECK_GL_ERROR(mGLShaderHandle = glCreateShader(shaderType));
-
-            if(caps->hasCapability(RSC_DEBUG))
-            {
-                glLabelObjectEXT(GL_SHADER_OBJECT_EXT, mGLShaderHandle, 0, mName.c_str());
-            }
-
-            // also create program object
-            if (caps->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
-            {
-                OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
-            }
         }
 
         // Add preprocessor extras and main source
@@ -191,7 +179,7 @@ namespace Ogre {
                     }
                 }
             }
-    
+
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
             const char *source = (getOptimiserEnabled() && getIsOptimised()) ? mOptimisedSource.c_str() : mSource.c_str();
 #else
@@ -204,7 +192,7 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glCompileShader(mGLShaderHandle));
 
         // Check for compile errors
-        int compiled;
+        int compiled = 0;
         OGRE_CHECK_GL_ERROR(glGetShaderiv(mGLShaderHandle, GL_COMPILE_STATUS, &compiled));
 
         String compileInfo = GLSLES::getObjectInfo(mGLShaderHandle);
@@ -217,24 +205,19 @@ namespace Ogre {
             LogManager::getSingleton().stream(LML_WARNING) << getResourceLogName() << " " << compileInfo;
     }
 
-#if !OGRE_NO_GLES2_GLSL_OPTIMISER   
+#if !OGRE_NO_GLES2_GLSL_OPTIMISER
     //-----------------------------------------------------------------------
-    void GLSLESProgram::setOptimiserEnabled(bool enabled) 
-    { 
+    void GLSLESProgram::setOptimiserEnabled(bool enabled)
+    {
         if(mOptimiserEnabled != enabled && mOptimiserEnabled && mCompiled == 1)
         {
             OGRE_CHECK_GL_ERROR(glDeleteShader(mGLShaderHandle));
 
-            if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
-            {
-                OGRE_CHECK_GL_ERROR(glDeleteProgram(mGLProgramHandle));
-            }
-            
             mGLShaderHandle = 0;
             mGLProgramHandle = 0;
             mCompiled = 0;
         }
-        mOptimiserEnabled = enabled; 
+        mOptimiserEnabled = enabled;
     }
 #endif
     //-----------------------------------------------------------------------
@@ -246,14 +229,10 @@ namespace Ogre {
 //                                                  " and program " + StringConverter::toString(mGLProgramHandle));
             OGRE_CHECK_GL_ERROR(glDeleteShader(mGLShaderHandle));
 
-            if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
-            {
-                OGRE_CHECK_GL_ERROR(glDeleteProgram(mGLProgramHandle));
-            }
             // destroy all programs using this shader
             GLSLESProgramManager::getSingletonPtr()->destroyAllByShader(this);
 
-            
+
             mGLShaderHandle = 0;
             mGLProgramHandle = 0;
             mLinked = 0;
