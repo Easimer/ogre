@@ -59,14 +59,10 @@ namespace Ogre {
             void blit(const HardwarePixelBufferSharedPtr &src, const Box &srcBox, const Box &dstBox);
             void blitToMemory(const Box &srcBox, const PixelBox &dst) override;
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-        // Friends.
-        protected:
             friend class GLES2Texture;
-                
             void updateTextureId(GLuint textureID);
-#endif
-                
+            GLuint textureId() const { return mTextureID; }
+
         protected:
             // Blitting implementation
             void blitFromTexture(GLES2TextureBuffer *src, const Box &srcBox, const Box &dstBox);

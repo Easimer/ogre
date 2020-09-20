@@ -126,7 +126,7 @@ namespace Ogre {
         if(mIsMultiSampleSupported && mNumSamples > 0)
         {
             // Determine how many MSAA samples to use
-            GLint maxSamplesAllowed;
+            GLint maxSamplesAllowed = 0;
             glGetIntegerv(GL_MAX_SAMPLES_APPLE, &maxSamplesAllowed);
             int samplesToUse = (mNumSamples > maxSamplesAllowed) ? maxSamplesAllowed : mNumSamples;
             

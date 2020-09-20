@@ -79,12 +79,12 @@ namespace Ogre {
         mVertexBuffers[1].reset();
 
         // Create query objects
-        OGRE_CHECK_GL_ERROR(glGenQueries(1, &mPrimitivesDrawnQuery));
+        OGRE_CHECK_GL_ERROR(glGenQueriesEXT(1, &mPrimitivesDrawnQuery));
     }
 //-----------------------------------------------------------------------------
     GLES2RenderToVertexBuffer::~GLES2RenderToVertexBuffer()
     {
-        OGRE_CHECK_GL_ERROR(glDeleteQueries(1, &mPrimitivesDrawnQuery));
+        OGRE_CHECK_GL_ERROR(glDeleteQueriesEXT(1, &mPrimitivesDrawnQuery));
     }
 //-----------------------------------------------------------------------------
     void GLES2RenderToVertexBuffer::getRenderOperation(RenderOperation& op)
@@ -169,7 +169,7 @@ namespace Ogre {
             targetRenderSystem->bindGpuProgramParameters(GPT_GEOMETRY_PROGRAM,
                                                          r2vbPass->getGeometryProgramParameters(), GPV_ALL);
         }
-        OGRE_CHECK_GL_ERROR(glBeginQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN, mPrimitivesDrawnQuery));
+        OGRE_CHECK_GL_ERROR(glBeginQueryEXT(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN, mPrimitivesDrawnQuery));
 
         OGRE_CHECK_GL_ERROR(glBeginTransformFeedback(getR2VBPrimitiveType(mOperationType)));
 
@@ -178,13 +178,13 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glEndTransformFeedback());
 
         // Finish the query
-        OGRE_CHECK_GL_ERROR(glEndQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN));
+        OGRE_CHECK_GL_ERROR(glEndQueryEXT(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN));
 
         OGRE_CHECK_GL_ERROR(glDisable(GL_RASTERIZER_DISCARD));
 
         // Read back query results
         GLuint primitivesWritten;
-        OGRE_CHECK_GL_ERROR(glGetQueryObjectuiv(mPrimitivesDrawnQuery, GL_QUERY_RESULT, &primitivesWritten));
+        OGRE_CHECK_GL_ERROR(glGetQueryObjectuivEXT(mPrimitivesDrawnQuery, GL_QUERY_RESULT, &primitivesWritten));
         mVertexData->vertexCount = primitivesWritten * getVertexCountPerPrimitive(mOperationType);
 
         // Switch the vertex binding if necessary

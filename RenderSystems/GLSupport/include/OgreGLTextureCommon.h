@@ -47,6 +47,8 @@ public:
 
     uint getGLID() const { return mTextureID; }
 
+    void setGLID(uint textureID) { mTextureID = textureID; }
+
     void getCustomAttribute(const String& name, void* pData);
 
 protected:
