@@ -46,7 +46,6 @@ THE SOFTWARE.
 #endif
 #include "OgreGLSLESLinkProgram.h"
 #include "OgreGLSLESProgramManager.h"
-#include "OgreGLSLESProgramPipeline.h"
 #include "OgreGLES2StateCacheManager.h"
 #include "OgreRenderWindow.h"
 #include "OgreGLES2PixelFormat.h"
@@ -69,39 +68,6 @@ Ogre::GLES2ManagedResourceManager* Ogre::GLES2RenderSystem::mResourceManager = N
 #endif
 
 using namespace std;
-
-static void gl2ext_to_gl3core() {
-    glUnmapBufferOES = glUnmapBuffer;
-    glRenderbufferStorageMultisampleAPPLE = glRenderbufferStorageMultisample;
-
-    glGenQueriesEXT = glGenQueries;
-    glDeleteQueriesEXT = glDeleteQueries;
-    glBeginQueryEXT = glBeginQuery;
-    glEndQueryEXT = glEndQuery;
-    glGetQueryObjectuivEXT = glGetQueryObjectuiv;
-
-    glMapBufferRangeEXT = glMapBufferRange;
-    glFlushMappedBufferRangeEXT = glFlushMappedBufferRange;
-
-    glTexImage3DOES = (PFNGLTEXIMAGE3DOESPROC)glTexImage3D;
-    glCompressedTexImage3DOES = glCompressedTexImage3D;
-    glTexSubImage3DOES = glTexSubImage3D;
-    glCompressedTexSubImage3DOES = glCompressedTexSubImage3D;
-
-    glFenceSyncAPPLE = glFenceSync;
-    glClientWaitSyncAPPLE = glClientWaitSync;
-    glDeleteSyncAPPLE = glDeleteSync;
-
-    glProgramBinaryOES = glProgramBinary;
-    glGetProgramBinaryOES = glGetProgramBinary;
-
-    glDrawElementsInstancedEXT = glDrawElementsInstanced;
-    glDrawArraysInstancedEXT = glDrawArraysInstanced;
-    glVertexAttribDivisorEXT = glVertexAttribDivisor;
-    glBindVertexArrayOES = glBindVertexArray;
-    glGenVertexArraysOES = glGenVertexArrays;
-    glDeleteVertexArraysOES = glDeleteVertexArrays;
-}
 
 namespace Ogre {
 
@@ -174,9 +140,9 @@ namespace Ogre {
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
         mResourceManager = OGRE_NEW GLES2ManagedResourceManager();
 #endif
-        
+
         mGLSupport = getGLSupport(GLNativeSupport::CONTEXT_ES);
-        
+
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS && OGRE_PLATFORM != OGRE_PLATFORM_ANDROID && OGRE_PLATFORM != OGRE_PLATFORM_WIN32
         glsupport = mGLSupport;
 #endif
@@ -249,15 +215,16 @@ namespace Ogre {
         rsc->setVendor(mVendor);
 
         // Multitexturing support and set number of texture units
-        GLint units;
+        GLint units = 0;
         OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &units));
         rsc->setNumTextureUnits(std::min(OGRE_MAX_TEXTURE_LAYERS, units));
 
-        glGetIntegerv( GL_MAX_VERTEX_ATTRIBS , &units);
-        rsc->setNumVertexAttributes(units);
+        GLint attribs = 0;
+        glGetIntegerv( GL_MAX_VERTEX_ATTRIBS , &attribs);
+        rsc->setNumVertexAttributes(attribs);
 
         // Check for hardware stencil support and set bit depth
-        GLint stencil;
+        GLint stencil = 0;
 
         OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_STENCIL_BITS, &stencil));
 
@@ -303,7 +270,7 @@ namespace Ogre {
                checkExtension("GL_IMG_texture_compression_pvrtc2") ||
                checkExtension("WEBGL_compressed_texture_pvrtc"))
                 rsc->setCapability(RSC_TEXTURE_COMPRESSION_PVRTC);
-                
+
             if((checkExtension("GL_EXT_texture_compression_dxt1") &&
                checkExtension("GL_EXT_texture_compression_s3tc")) ||
                checkExtension("WEBGL_compressed_texture_s3tc"))
@@ -339,7 +306,7 @@ namespace Ogre {
         {
             // Probe number of draw buffers
             // Only makes sense with FBO support, so probe here
-            GLint buffers;
+            GLint buffers = 0;
             glGetIntegerv(GL_MAX_DRAW_BUFFERS, &buffers);
             rsc->setNumMultiRenderTargets(
                 std::min<int>(buffers, (GLint)OGRE_MAX_MULTIPLE_RENDER_TARGETS));
@@ -361,7 +328,7 @@ namespace Ogre {
         // Point sprites
         rsc->setCapability(RSC_POINT_SPRITES);
         rsc->setCapability(RSC_POINT_EXTENDED_PARAMETERS);
-        
+
         // GLSL ES is always supported in GL ES 2
         rsc->addShaderProfile("glsles");
         if (getNativeShadingLanguageVersion() >= 320)
@@ -429,7 +396,7 @@ namespace Ogre {
         // Alpha to coverage always 'supported' when MSAA is available
         // although card may ignore it if it doesn't specifically support A2C
         rsc->setCapability(RSC_ALPHA_TO_COVERAGE);
-        
+
         // No point sprites, so no size
         rsc->setMaxPointSize(0.f);
 
@@ -440,7 +407,7 @@ namespace Ogre {
         if (hasMinGLVersion(3, 0) || checkExtension("GL_OES_get_program_binary"))
         {
             // http://www.khronos.org/registry/gles/extensions/OES/OES_get_program_binary.txt
-            GLint formats;
+            GLint formats = 0;
             OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS_OES, &formats));
 
             if(formats > 0)
@@ -454,9 +421,6 @@ namespace Ogre {
         else if(checkExtension("GL_ANGLE_instanced_arrays"))
         {
             rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
-            glDrawElementsInstancedEXT = glDrawElementsInstancedANGLE;
-            glDrawArraysInstancedEXT = glDrawArraysInstancedANGLE;
-            glVertexAttribDivisorEXT = glVertexAttribDivisorANGLE;
         }
 
         if (checkExtension("GL_EXT_debug_marker") &&
@@ -685,39 +649,39 @@ namespace Ogre {
     void GLES2RenderSystem::_destroyDepthBuffer(RenderTarget* pWin)
     {
         GLContext *windowContext = dynamic_cast<GLRenderTarget*>(pWin)->getContext();
-        
+
         // 1 Window <-> 1 Context, should be always true
         assert( windowContext );
-        
+
         bool bFound = false;
         // Find the depth buffer from this window and remove it.
         DepthBufferMap::iterator itMap = mDepthBufferPool.begin();
         DepthBufferMap::iterator enMap = mDepthBufferPool.end();
-        
+
         while( itMap != enMap && !bFound )
         {
             DepthBufferVec::iterator itor = itMap->second.begin();
             DepthBufferVec::iterator end  = itMap->second.end();
-            
+
             while( itor != end )
             {
                 // A DepthBuffer with no depth & stencil pointers is a dummy one,
                 // look for the one that matches the same GL context
                 auto depthBuffer = static_cast<GLDepthBufferCommon*>(*itor);
                 GLContext *glContext = depthBuffer->getGLContext();
-                
+
                 if( glContext == windowContext &&
                    (depthBuffer->getDepthBuffer() || depthBuffer->getStencilBuffer()) )
                 {
                     bFound = true;
-                    
+
                     delete *itor;
                     itMap->second.erase( itor );
                     break;
                 }
                 ++itor;
             }
-            
+
             ++itMap;
         }
     }
@@ -883,11 +847,11 @@ namespace Ogre {
         else if (vp != mActiveViewport || vp->_isUpdated())
         {
             RenderTarget* target;
-            
+
             target = vp->getTarget();
             _setRenderTarget(target);
             mActiveViewport = vp;
-            
+
             // Calculate the "lower-left" corner of the viewport
             Rect vpRect = vp->getActualDimensions();
             if (!target->requiresTextureFlipping())
@@ -897,11 +861,11 @@ namespace Ogre {
                 vpRect.top = target->getHeight() - vpRect.top;
                 vpRect.bottom = target->getHeight() - vpRect.bottom;
             }
-            
+
 #if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
             ConfigOptionMap::const_iterator opt;
             ConfigOptionMap::const_iterator end = mGLSupport->getConfigOptions().end();
-            
+
             if ((opt = mGLSupport->getConfigOptions().find("Orientation")) != end)
             {
                 String val = opt->second.currentValue;
@@ -1053,7 +1017,7 @@ namespace Ogre {
     {
         if(hasMinGLVersion(3, 0) || checkExtension("GL_EXT_occlusion_query_boolean"))
         {
-            GLES2HardwareOcclusionQuery* ret = new GLES2HardwareOcclusionQuery(); 
+            GLES2HardwareOcclusionQuery* ret = new GLES2HardwareOcclusionQuery();
             mHwOcclusionQueries.push_back(ret);
             return ret;
         }
@@ -1131,16 +1095,16 @@ namespace Ogre {
 
     void GLES2RenderSystem::_setTextureUnitFiltering(size_t unit, FilterOptions minFilter,
                 FilterOptions magFilter, FilterOptions mipFilter)
-    {       
+    {
         mMipFilter = mipFilter;
         if(mCurTexMipCount == 0 && mMipFilter != FO_NONE)
         {
-            mMipFilter = FO_NONE;           
+            mMipFilter = FO_NONE;
         }
         _setTextureUnitFiltering(unit, FT_MAG, magFilter);
         _setTextureUnitFiltering(unit, FT_MIN, minFilter);
     }
-                
+
     void GLES2RenderSystem::_setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions fo)
     {
         if (!mStateCacheManager->activateGLTextureUnit(unit))
@@ -1179,7 +1143,7 @@ namespace Ogre {
                 mStateCacheManager->setTexParameteri(mTextureTypes[unit],
                                                      GL_TEXTURE_MIN_FILTER,
                                                      getCombinedMinMipFilter(mMinFilter, mMipFilter));
-                
+
                 break;
         }
     }
@@ -1277,7 +1241,7 @@ namespace Ogre {
             {
                 if(numberOfInstances > 1)
                 {
-                    OGRE_CHECK_GL_ERROR(glDrawElementsInstancedEXT((polyMode == GL_FILL) ? primType : polyMode, static_cast<GLsizei>(op.indexData->indexCount), indexType, pBufferData, static_cast<GLsizei>(numberOfInstances)));
+                    OGRE_CHECK_GL_ERROR(glDrawElementsInstancedANGLE((polyMode == GL_FILL) ? primType : polyMode, static_cast<GLsizei>(op.indexData->indexCount), indexType, pBufferData, static_cast<GLsizei>(numberOfInstances)));
                 }
                 else
                 {
@@ -1292,7 +1256,7 @@ namespace Ogre {
             {
                 if(numberOfInstances > 1)
                 {
-                    OGRE_CHECK_GL_ERROR(glDrawArraysInstancedEXT((polyMode == GL_FILL) ? primType : polyMode, 0, static_cast<GLsizei>(op.vertexData->vertexCount), static_cast<GLsizei>(numberOfInstances)));
+                    OGRE_CHECK_GL_ERROR(glDrawArraysInstancedANGLE((polyMode == GL_FILL) ? primType : polyMode, 0, static_cast<GLsizei>(op.vertexData->vertexCount), static_cast<GLsizei>(numberOfInstances)));
                 }
                 else
                 {
@@ -1315,7 +1279,7 @@ namespace Ogre {
 
             // Unbind any instance attributes
             for (std::vector<GLuint>::iterator ai = mRenderInstanceAttribsBound.begin(); ai != mRenderInstanceAttribsBound.end(); ++ai)
-                OGRE_CHECK_GL_ERROR(glVertexAttribDivisorEXT(*ai, 0));
+                OGRE_CHECK_GL_ERROR(glVertexAttribDivisorANGLE(*ai, 0));
         }
         mRenderAttribsBound.clear();
         mRenderInstanceAttribsBound.clear();
@@ -1473,7 +1437,7 @@ namespace Ogre {
     {
         if(HardwareBufferManager::getSingletonPtr())
             static_cast<GLES2HardwareBufferManager*>(HardwareBufferManager::getSingletonPtr())->notifyContextDestroyed(context);
-        
+
         for(RenderTargetMap::iterator it = mRenderTargets.begin(); it!=mRenderTargets.end(); ++it)
         {
             if(auto target = dynamic_cast<GLRenderTarget*>(it->second))
@@ -1482,7 +1446,7 @@ namespace Ogre {
                     fbo->notifyContextDestroyed(context);
             }
         }
-        
+
         if (mCurrentContext == context)
         {
             // Change the context to something else so that a valid context
@@ -1518,7 +1482,7 @@ namespace Ogre {
         else
             OGRE_CHECK_GL_ERROR(glDeleteVertexArraysOES(1, &vao));
     }
-    
+
     void GLES2RenderSystem::_destroyFbo(GLContext* context, uint32 fbo)
     {
         if(context != mCurrentContext)
@@ -1576,7 +1540,6 @@ namespace Ogre {
         mStateCacheManager = mCurrentContext->createOrRetrieveStateCacheManager<GLES2StateCacheManager>();
 
         if(hasMinGLVersion(3, 0)) {
-            gl2ext_to_gl3core();
             GLES2PixelUtil::useSizedFormats();
         }
 
@@ -1668,11 +1631,11 @@ namespace Ogre {
     {
         if (!prg)
         {
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                         "Null program bound.",
                         "GLES2RenderSystem::bindGpuProgram");
         }
-        
+
         GLSLESProgram* glprg = static_cast<GLSLESProgram*>(prg);
 
         switch (glprg->getType())
@@ -1680,14 +1643,14 @@ namespace Ogre {
             case GPT_VERTEX_PROGRAM:
                 mCurrentVertexProgram = glprg;
                 break;
-                
+
             case GPT_FRAGMENT_PROGRAM:
                 mCurrentFragmentProgram = glprg;
                 break;
             default:
                 break;
         }
-        
+
         // Bind the program
         mProgramManager->setActiveShader(glprg->getType(), glprg);
 
@@ -1778,11 +1741,11 @@ namespace Ogre {
         LogManager::getSingleton().logMessage("********************************************");
         LogManager::getSingleton().logMessage("*** OpenGL ES 2.x Reset Renderer Started ***");
         LogManager::getSingleton().logMessage("********************************************");
-                
+
         initialiseContext(win);
-        
+
         static_cast<GLES2FBOManager*>(mRTTManager)->_reload();
-        
+
         _destroyDepthBuffer(win);
 
         auto depthBuffer =
@@ -1790,14 +1753,14 @@ namespace Ogre {
 
         mDepthBufferPool[depthBuffer->getPoolId()].push_back( depthBuffer );
         win->attachDepthBuffer( depthBuffer );
-        
+
         GLES2RenderSystem::mResourceManager->notifyOnContextReset();
-        
+
         mStateCacheManager->clearCache();
         _setViewport(NULL);
         _setRenderTarget(win);
     }
-    
+
     GLES2ManagedResourceManager* GLES2RenderSystem::getResourceManager()
     {
         return GLES2RenderSystem::mResourceManager;
@@ -1828,7 +1791,7 @@ namespace Ogre {
             {
                 if (vertexBuffer->isInstanceData())
                 {
-                    OGRE_CHECK_GL_ERROR(glVertexAttribDivisorEXT(attrib, static_cast<GLuint>(vertexBuffer->getInstanceDataStepRate())));
+                    OGRE_CHECK_GL_ERROR(glVertexAttribDivisorANGLE(attrib, static_cast<GLuint>(vertexBuffer->getInstanceDataStepRate())));
                     mRenderInstanceAttribsBound.push_back(attrib);
                 }
             }

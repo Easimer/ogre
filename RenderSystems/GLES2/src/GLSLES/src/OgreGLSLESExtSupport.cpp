@@ -66,12 +66,6 @@ namespace Ogre
                 OGRE_CHECK_GL_ERROR(glGetProgramiv(obj, GL_INFO_LOG_LENGTH, &infologLength));
             }
 
-            else if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
-            {
-                if(glIsProgramPipelineEXT(obj))
-                    OGRE_CHECK_GL_ERROR(glGetProgramPipelineivEXT(obj, GL_INFO_LOG_LENGTH, &infologLength));
-            }
-
             if (infologLength > 1)
             {
                 GLint charsWritten  = 0;
@@ -86,11 +80,6 @@ namespace Ogre
                 else if(glIsProgram(obj))
                 {
                     OGRE_CHECK_GL_ERROR(glGetProgramInfoLog(obj, infologLength, &charsWritten, infoLog));
-                }
-                else if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
-                {
-                    if(glIsProgramPipelineEXT(obj))
-                        OGRE_CHECK_GL_ERROR(glGetProgramPipelineInfoLogEXT(obj, infologLength, &charsWritten, infoLog));
                 }
 
                 if (strlen(infoLog) > 0)

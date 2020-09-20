@@ -212,14 +212,10 @@ namespace Ogre {
     {
         ::EGLSurface surface;
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-        int* gamma_attribs = NULL;
-#else
-        int gamma_attribs[] = {EGL_GL_COLORSPACE_KHR, EGL_GL_COLORSPACE_SRGB_KHR, EGL_NONE};
-#endif
-        mHwGamma = mHwGamma && mGLSupport->checkExtension("EGL_KHR_gl_colorspace");
+        mHwGamma = false;
+        int gamma_attribs[] = { EGL_NONE };
 
-        surface = eglCreateWindowSurface(display, mEglConfig, (EGLNativeWindowType)win, mHwGamma ? gamma_attribs : NULL);
+        surface = eglCreateWindowSurface(display, mEglConfig, (EGLNativeWindowType)win, gamma_attribs);
         EGL_CHECK_ERROR
 
         if (surface == EGL_NO_SURFACE)

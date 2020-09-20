@@ -10,6 +10,7 @@ cmake-build-*/
 /embuild/
 /eminstall/
 /mingw/
+/out/
 
 # Meta data of macOS's Finder.app
 .DS_Store
