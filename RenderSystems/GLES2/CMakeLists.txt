@@ -55,11 +55,13 @@ if (APPLE)
   set(PLATFORM_HEADER_INSTALL "APPLE")
 endif ()
 
+message("INLUDE ELECTRON")
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/GLSLES/include)
-include_directories("S:/electron-gp/src" "S:/electron-gp/src/gpu" "S:/electron-gp/src/third_party/khronos")
+include_directories("D:/_DEV/ELECTRON/electron-gn/src" "D:/_DEV/ELECTRON/electron-gn/src/gpu" "D:/_DEV/ELECTRON/electron-gn/src/third_party/khronos")
 
 add_library(RenderSystem_GLES2 STATIC ${HEADER_FILES} ${GLESW_HEADERS} ${KHR_HEADERS} ${PLATFORM_HEADERS} ${SOURCE_FILES} ${PLATFORM_SOURCES} ${GLSLES_FILES})
-target_link_libraries(RenderSystem_GLES2 OgreMain OgreGLSupport "S:/electron-gp/src/out/Release/electron.lib" ${CMAKE_DL_LIBS})
+target_link_libraries(RenderSystem_GLES2 OgreMain OgreGLSupport "D:/_DEV/ELECTRON/electron-gn/src/out/Release/electron.lib" ${CMAKE_DL_LIBS})
 target_include_directories(RenderSystem_GLES2 PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     $<INSTALL_INTERFACE:include/OGRE/RenderSystems/GLES2>)
