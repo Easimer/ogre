@@ -12,7 +12,9 @@
 # Add platform specific settings
 
 if(EGL_FOUND)
-  cmake_dependent_option(OGRE_GLSUPPORT_USE_EGL "use EGL for GL Context Creation instead of GLX/ WGL" TRUE "NOT WIN32" FALSE)
+  option(OGRE_GLSUPPORT_USE_EGL "use EGL for GL Context Creation instead of GLX/ WGL" FALSE)
+elseif(OGRE_BUILD_RENDERSYSTEM_GLES2CHROMIUM)
+  option(OGRE_GLSUPPORT_USE_EGL "use EGL for GL Context Creation instead of GLX/ WGL" TRUE)
 endif()
 
 if(ANDROID)
@@ -101,9 +103,9 @@ target_link_libraries(OgreGLSupport PUBLIC OgreMain PRIVATE ${PLATFORM_LIBS})
 target_include_directories(OgreGLSupport PUBLIC 
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/GLSL>"
-    "S:/electron-gp/src"
-    "S:/electron-gp/src/gpu"
-    "S:/electron-gp/src/third_party/khronos"
+    "D:/_DEV/ELECTRON/electron-gn/src"
+    "D:/_DEV/ELECTRON/electron-gn/src/gpu"
+    "D:/_DEV/ELECTRON/electron-gn/src/third_party/khronos"
     PRIVATE "$<BUILD_INTERFACE:${NATIVE_INCLUDES}>")
 
 set_property(TARGET OgreGLSupport PROPERTY POSITION_INDEPENDENT_CODE ON)
