@@ -282,6 +282,14 @@ elseif(EMSCRIPTEN)
 elseif (APPLE AND NOT APPLE_IOS)
   # Make sure that the GLES2 render system is disabled for non-iOS Apple builds
   set(OGRE_BUILD_RENDERSYSTEM_GLES2 FALSE CACHE BOOL "" FORCE)
+
+  set(XCODE_ATTRIBUTE_SDKROOT macosx)
+  if(CMAKE_GENERATOR STREQUAL "Unix Makefiles")
+    execute_process(COMMAND xcodebuild -version -sdk "${XCODE_ATTRIBUTE_SDKROOT}" Path | head -n 1 OUTPUT_VARIABLE CMAKE_OSX_SYSROOT)
+    string(REGEX REPLACE "(\r?\n)+$" "" CMAKE_OSX_SYSROOT "${CMAKE_OSX_SYSROOT}")
+  else()
+    set(CMAKE_OSX_SYSROOT macosx)
+  endif()
 endif ()
 
 if(OGRE_BUILD_COMPONENT_MESHLODGENERATOR)

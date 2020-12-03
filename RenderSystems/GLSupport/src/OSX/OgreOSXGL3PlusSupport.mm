@@ -83,7 +83,7 @@ ConfigOptionMap OSXGLSupport::getConfigOptions()
 	CFIndex numModes = CFArrayGetCount(displayModes);
 	CFMutableArrayRef goodModes = NULL;
 	goodModes = CFArrayCreateMutable(kCFAllocatorDefault, numModes, NULL);
-	
+
 	// Grab all the available display modes, then weed out duplicates...
 	for(int i = 0; i < numModes; ++i)
 	{
@@ -95,56 +95,56 @@ ConfigOptionMap OSXGLSupport::getConfigOptions()
         bool safeForHardware = ioFlags & kDisplayModeSafetyFlags ? true : false;
 		bool stretched = ioFlags & kDisplayModeStretchedFlag ? true : false;
 		bool skipped = false;
-		
+
 		if((safeForHardware) || (!stretched))
 		{
 			size_t width  = CGDisplayModeGetWidth(modeInfo);
-			size_t height = CGDisplayModeGetHeight(modeInfo); 
-			
+			size_t height = CGDisplayModeGetHeight(modeInfo);
+
 			for(CFIndex j = 0; j < CFArrayGetCount(goodModes); ++j)
 			{
 				CGDisplayModeRef otherMode = (CGDisplayModeRef)CFArrayGetValueAtIndex(goodModes, j);
-                
+
 				size_t otherWidth  = CGDisplayModeGetWidth(otherMode);
 				size_t otherHeight = CGDisplayModeGetHeight(otherMode);
-				
+
 				// If we find a duplicate then skip this mode
 				if((otherWidth == width) && (otherHeight == height))
 					skipped = true;
 			}
-			
+
 			// This is a new mode, so add it to our goodModes array
 			if(!skipped)
 				CFArrayAppendValue(goodModes, modeInfo);
 		}
 	}
-	
+
     // Release memory
     CFRelease(displayModes);
 
 	// Sort the modes...
-	CFArraySortValues(goodModes, CFRangeMake(0, CFArrayGetCount(goodModes)), 
+	CFArraySortValues(goodModes, CFRangeMake(0, CFArrayGetCount(goodModes)),
 					  (CFComparatorFunction)_compareModes, NULL);
-					  
+
 	// Now pull the modes out and put them into optVideoModes
 	for(int i = 0; i < CFArrayGetCount(goodModes); ++i)
 	{
 		CGDisplayModeRef resolution = (CGDisplayModeRef)CFArrayGetValueAtIndex(goodModes, i);
-		
+
 		size_t fWidth  = CGDisplayModeGetWidth(resolution);
 		size_t fHeight = CGDisplayModeGetHeight(resolution);
 		// allow 16 and 32 bpp
 		mVideoModes.push_back({uint32(fWidth), uint32(fHeight),0, 16});
 		mVideoModes.push_back({uint32(fWidth), uint32(fHeight),0, 32});
     }
-	
+
     // Release memory
     CFRelease(goodModes);
 
 	return mOptions;
 }
 
-RenderWindow* OSXGLSupport::newWindow( const String &name, unsigned int width, unsigned int height, 
+RenderWindow* OSXGLSupport::newWindow( const String &name, unsigned int width, unsigned int height,
 	bool fullScreen, const NameValuePairList *miscParams )
 {
     NameValuePairList params;
@@ -192,15 +192,15 @@ CFComparisonResult OSXGLSupport::_compareModes (const void *val1, const void *va
 	CGDisplayModeGetIOFlags((mode), kDisplayModeStretchedFlag)
 	CGDisplayModeGetIOFlags((mode), kDisplayModeSafetyFlags)
 	*/
-	
+
 	// CFArray comparison callback for sorting display modes.
 	#pragma unused(context)
 	CGDisplayModeRef thisMode = (CGDisplayModeRef)val1;
 	CGDisplayModeRef otherMode = (CGDisplayModeRef)val2;
-	
+
 	size_t width = CGDisplayModeGetWidth(thisMode);
 	size_t otherWidth = CGDisplayModeGetWidth(otherMode);
-	
+
 	size_t height = CGDisplayModeGetHeight(thisMode);
 	size_t otherHeight = CGDisplayModeGetHeight(otherMode);
 
@@ -235,10 +235,10 @@ Boolean OSXGLSupport::_getDictionaryBoolean(CFDictionaryRef dict, const void* ke
 	Boolean value = false;
 	CFBooleanRef boolRef;
 	boolRef = (CFBooleanRef)CFDictionaryGetValue(dict, key);
-	
+
 	if (boolRef != NULL)
-		value = CFBooleanGetValue(boolRef); 	
-		
+		value = CFBooleanGetValue(boolRef);
+
 	return value;
 }
 
@@ -247,10 +247,10 @@ long OSXGLSupport::_getDictionaryLong(CFDictionaryRef dict, const void* key)
 	long value = 0;
 	CFNumberRef numRef;
 	numRef = (CFNumberRef)CFDictionaryGetValue(dict, key);
-	
+
 	if (numRef != NULL)
-		CFNumberGetValue(numRef, kCFNumberLongType, &value);	
-		
+		CFNumberGetValue(numRef, kCFNumberLongType, &value);
+
 	return value;
 }
 

@@ -3,19 +3,19 @@
  This source file is part of OGRE
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
- 
+
  Copyright (c) 2000-2014 Torus Knot Software Ltd
- 
+
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
  in the Software without restriction, including without limitation the rights
  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  copies of the Software, and to permit persons to whom the Software is
  furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included in
  all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -31,18 +31,18 @@
 #include "OgreRoot.h"
 
 namespace Ogre {
-    
+
     GLES2StateCacheManager::GLES2StateCacheManager(void)
     {
         clearCache();
     }
-    
+
     void GLES2StateCacheManager::initializeCache()
     {
         OGRE_CHECK_GL_ERROR(glBlendEquation(GL_FUNC_ADD));
-        
+
         OGRE_CHECK_GL_ERROR(glBlendFunc(GL_ONE, GL_ZERO));
-        
+
         OGRE_CHECK_GL_ERROR(glCullFace(mCullFace));
 
         OGRE_CHECK_GL_ERROR(glDepthFunc(mDepthFunc));
@@ -69,7 +69,7 @@ namespace Ogre {
 
         OGRE_CHECK_GL_ERROR(glColorMask(mColourMask[0], mColourMask[1], mColourMask[2], mColourMask[3]));
     }
-    
+
     void GLES2StateCacheManager::clearCache()
     {
         mDepthMask = GL_TRUE;
@@ -81,17 +81,17 @@ namespace Ogre {
         mActiveTextureUnit = 0;
         mClearDepth = 1.0f;
         mLastBoundTexID = 0;
-        
+
         // Initialize our cache variables and also the GL so that the
         // stored values match the GL state
         mBlendFuncSource = GL_ONE;
         mBlendFuncDest = GL_ZERO;
         mBlendFuncSourceAlpha = GL_ONE;
         mBlendFuncDestAlpha = GL_ZERO;
-        
+
         mClearColour[0] = mClearColour[1] = mClearColour[2] = mClearColour[3] = 0.0f;
         mColourMask[0] = mColourMask[1] = mColourMask[2] = mColourMask[3] = GL_TRUE;
-        
+
         mActiveVertexArray = 0;
 
 #ifdef OGRE_ENABLE_STATE_CACHE
@@ -133,13 +133,13 @@ namespace Ogre {
             }
         }
     }
-    
+
     void GLES2StateCacheManager::deleteGLBuffer(GLenum target, GLuint buffer)
     {
         // Buffer name 0 is reserved and we should never try to delete it
         if(buffer == 0)
             return;
-        
+
         if(target == GL_FRAMEBUFFER)
         {
             OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &buffer));
@@ -155,7 +155,7 @@ namespace Ogre {
 
 #ifdef OGRE_ENABLE_STATE_CACHE
         BindBufferMap::iterator i = mActiveBufferMap.find(target);
-        
+
         if (i != mActiveBufferMap.end() && ((*i).second == buffer))
         {
             // Currently bound buffer is being deleted, update the cached value to 0,
@@ -198,11 +198,11 @@ namespace Ogre {
         {
             TextureUnitParams unit;
             mTexUnitsMap[mLastBoundTexID] = unit;
-            
+
             // Update the iterator
             it = mTexUnitsMap.find(mLastBoundTexID);
         }
-        
+
         // Get a local copy of the parameter map and search for this parameter
         TexParameteriMap &myMap = (*it).second.mTexParameteriMap;
         auto ret = myMap.emplace(pname, param);
@@ -212,7 +212,7 @@ namespace Ogre {
         if((*i).second != param || ret.second)
         {
             (*i).second = param;
-            
+
             // Update GL
             OGRE_CHECK_GL_ERROR(glTexParameteri(target, pname, param));
         }
@@ -256,11 +256,11 @@ namespace Ogre {
     void GLES2StateCacheManager::bindGLTexture(GLenum target, GLuint texture)
     {
         mLastBoundTexID = texture;
-        
+
         // Update GL
         OGRE_CHECK_GL_ERROR(glBindTexture(target, texture));
     }
-    
+
     bool GLES2StateCacheManager::activateGLTextureUnit(size_t unit)
     {
 #ifdef OGRE_ENABLE_STATE_CACHE
@@ -286,7 +286,7 @@ namespace Ogre {
             mBlendFuncDest = dest;
             mBlendFuncSourceAlpha = sourceA;
             mBlendFuncDestAlpha = destA;
-            
+
             OGRE_CHECK_GL_ERROR(glBlendFuncSeparate(source, dest, sourceA, destA));
         }
     }
@@ -303,7 +303,7 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glBlendEquationSeparate(eqRGB, eqAlpha));
         }
     }
-    
+
     void GLES2StateCacheManager::setDepthMask(GLboolean mask)
     {
 #ifdef OGRE_ENABLE_STATE_CACHE
@@ -311,21 +311,21 @@ namespace Ogre {
 #endif
         {
             mDepthMask = mask;
-            
+
             OGRE_CHECK_GL_ERROR(glDepthMask(mask));
         }
     }
-    
+
     void GLES2StateCacheManager::setDepthFunc(GLenum func)
     {
         if(mDepthFunc != func)
         {
             mDepthFunc = func;
-            
+
             OGRE_CHECK_GL_ERROR(glDepthFunc(func));
         }
     }
-    
+
     void GLES2StateCacheManager::setClearDepth(GLclampf depth)
     {
 #ifdef OGRE_ENABLE_STATE_CACHE
@@ -333,11 +333,11 @@ namespace Ogre {
 #endif
         {
             mClearDepth = depth;
-            
+
             OGRE_CHECK_GL_ERROR(glClearDepthf(depth));
         }
     }
-    
+
     void GLES2StateCacheManager::setClearColour(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
     {
 #ifdef OGRE_ENABLE_STATE_CACHE
@@ -351,11 +351,11 @@ namespace Ogre {
             mClearColour[1] = green;
             mClearColour[2] = blue;
             mClearColour[3] = alpha;
-            
+
             OGRE_CHECK_GL_ERROR(glClearColor(mClearColour[0], mClearColour[1], mClearColour[2], mClearColour[3]));
         }
     }
-    
+
     void GLES2StateCacheManager::setColourMask(GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha)
     {
 #ifdef OGRE_ENABLE_STATE_CACHE
@@ -369,11 +369,11 @@ namespace Ogre {
             mColourMask[1] = green;
             mColourMask[2] = blue;
             mColourMask[3] = alpha;
-            
+
             OGRE_CHECK_GL_ERROR(glColorMask(mColourMask[0], mColourMask[1], mColourMask[2], mColourMask[3]));
         }
     }
-    
+
     void GLES2StateCacheManager::setStencilMask(GLuint mask)
     {
 #ifdef OGRE_ENABLE_STATE_CACHE
@@ -381,11 +381,11 @@ namespace Ogre {
 #endif
         {
             mStencilMask = mask;
-            
+
             OGRE_CHECK_GL_ERROR(glStencilMask(mask));
         }
     }
-    
+
     void GLES2StateCacheManager::setEnabled(GLenum flag)
     {
 #ifdef OGRE_ENABLE_STATE_CACHE
@@ -393,14 +393,14 @@ namespace Ogre {
         if(!found)
         {
             mEnableVector.push_back(flag);
-            
+
             OGRE_CHECK_GL_ERROR(glEnable(flag));
         }
 #else
         OGRE_CHECK_GL_ERROR(glEnable(flag));
 #endif
     }
-    
+
     void GLES2StateCacheManager::setDisabled(GLenum flag)
     {
 #ifdef OGRE_ENABLE_STATE_CACHE
@@ -423,7 +423,7 @@ namespace Ogre {
 #endif
         {
             mCullFace = face;
-            
+
             OGRE_CHECK_GL_ERROR(glCullFace(face));
         }
     }

@@ -60,11 +60,11 @@ namespace Ogre
             GL states on the current context.
         */
         void initializeCache();
-        
+
         /** Clears all cached values
         */
         void clearCache();
-        
+
         /** Bind an OpenGL buffer of any type.
          @param target The buffer target.
          @param buffer The buffer ID.
