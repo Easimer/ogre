@@ -51,10 +51,6 @@ THE SOFTWARE.
 #include "OgreGLES2PixelFormat.h"
 #include "OgreGLES2FBOMultiRenderTarget.h"
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-#include "OgreEAGLES2Context.h"
-#endif
-
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
 #   include "OgreGLES2ManagedResourceManager.h"
 Ogre::GLES2ManagedResourceManager* Ogre::GLES2RenderSystem::mResourceManager = NULL;
@@ -70,13 +66,6 @@ Ogre::GLES2ManagedResourceManager* Ogre::GLES2RenderSystem::mResourceManager = N
 using namespace std;
 
 namespace Ogre {
-
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS && OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
-    static GLNativeSupport* glsupport;
-    static GLESWglProc get_proc(const char* proc) {
-        return (GLESWglProc)glsupport->getProcAddress(proc);
-    }
-#endif
 
     static GLint getCombinedMinMipFilter(FilterOptions min, FilterOptions mip)
     {
@@ -1350,10 +1339,6 @@ namespace Ogre {
             setScissorTest(true, vpRect);
         }
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-        static_cast<EAGLES2Context*>(mCurrentContext)->mDiscardBuffers = buffers;
-#endif
-
         // Clear buffers
         OGRE_CHECK_GL_ERROR(glClear(flags));
 
@@ -1521,13 +1506,9 @@ namespace Ogre {
         if (mCurrentContext)
             mCurrentContext->setCurrent();
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_WIN32
         // ios: EAGL2Support redirects to glesw for get_proc. Overwriting it there would create an infinite loop
         // android: eglGetProcAddress fails in some cases (e.g. Virtual Device), whereas dlsym always works.
         if (glGetError == NULL && gleswInit())
-#else
-        if (gleswInit2(get_proc))
-#endif
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                         "Could not initialize glesw",

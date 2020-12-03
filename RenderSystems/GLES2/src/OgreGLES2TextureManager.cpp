@@ -47,7 +47,7 @@ namespace Ogre {
         ResourceGroupManager::getSingleton()._unregisterResourceManager(mResourceType);
     }
 
-    Resource* GLES2TextureManager::createImpl(const String& name, ResourceHandle handle, 
+    Resource* GLES2TextureManager::createImpl(const String& name, ResourceHandle handle,
                                            const String& group, bool isManual,
                                            ManualResourceLoader* loader,
                                            const NameValuePairList* createParams)
@@ -102,7 +102,7 @@ namespace Ogre {
         // Assume non-floating point is supported always
         if (!PixelUtil::isFloatingPoint(getNativeFormat(ttype, format, usage)))
             return true;
-        
+
         // check for floating point extension
         return mRenderSystem->checkExtension("GL_OES_texture_float_linear");
     }
