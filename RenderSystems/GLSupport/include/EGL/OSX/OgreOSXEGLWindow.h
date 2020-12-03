@@ -1,9 +1,10 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-(Object-oriented Graphics Rendering Engine)
+    (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
+Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
 Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,21 +27,30 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __EAGL2ViewController_H__
-#define __EAGL2ViewController_H__
+#ifndef __OSXEGLWindow_H__
+#define __OSXEGLWindow_H__
 
-#import <UIKit/UIViewController.h>
-#import "OgreRoot.h"
-#import "OgreEAGL2Support.h"
+#include "OgreEGLWindow.h"
+#include "OgreOSXEGLSupport.h"
 
-using namespace Ogre;
+namespace Ogre {
+    class _OgrePrivate OSXEGLWindow : public EGLWindow
+    {
+    protected:
+        virtual void getLeftAndTopFromNativeWindow(int & left, int & top, uint width, uint height);
+        virtual void initNativeCreatedWindow(const NameValuePairList *miscParams);
+        virtual void createNativeWindow( int &left, int &top, uint &width, uint &height, String &title );
+        virtual void reposition(int left, int top);
+        virtual void resize(unsigned int width, unsigned int height);
+        virtual void windowMovedOrResized();
+        virtual void switchFullScreen(bool fullscreen);
 
-@interface EAGL2ViewController : UIViewController {
-    EAGL2Support *mGLSupport;
+    public:
+        OSXEGLWindow(OSXEGLSupport* glsupport);
+        void create(const String& name, unsigned int width, unsigned int height,
+                    bool fullScreen, const NameValuePairList *miscParams);
+
+    };
 }
-
-@property (assign) EAGL2Support *mGLSupport;
-
-@end
 
 #endif

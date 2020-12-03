@@ -83,14 +83,26 @@ namespace Ogre {
             {GL_NONE},                                           // PF_R8G8B8A8
 #endif
             {GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, GL_DEPTH_COMPONENT16}, // PF_DEPTH16
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+            {GL_NONE},                                           // PF_SHORT_RGBA
+#else
             {GL_RGBA, GL_UNSIGNED_SHORT, GL_RGBA16UI},           // PF_SHORT_RGBA
+#endif
             {GL_NONE},                                           // PF_R3G3B2
             {GL_RED, GL_HALF_FLOAT, GL_R16F},                    // PF_FLOAT16_R
             {GL_RED, GL_FLOAT, GL_R32F},                         // PF_FLOAT32_R
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+            {GL_NONE},                                           // PF_SHORT_GR
+#else
             {GL_RG, GL_UNSIGNED_SHORT, GL_RG16UI},               // PF_SHORT_GR
+#endif
             {GL_RG, GL_HALF_FLOAT, GL_RG16F},                    // PF_FLOAT16_GR
             {GL_RG, GL_FLOAT, GL_RG32F},                         // PF_FLOAT32_GR
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+            {GL_NONE},                                           // PF_SHORT_RGB
+#else
             {GL_RGB, GL_UNSIGNED_SHORT, GL_RGB16UI},             // PF_SHORT_RGB
+#endif
             {GL_NONE, GL_NONE, GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG}, // PF_PVRTC_RGB2
             {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG},// PF_PVRTC_RGBA2
             {GL_NONE, GL_NONE, GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG}, // PF_PVRTC_RGB4
@@ -132,6 +144,16 @@ namespace Ogre {
             {GL_NONE},                                           // PF_BC7_UNORM
             {GL_RED_EXT, GL_UNSIGNED_BYTE, GL_R8_EXT},           // PF_R8
             {GL_RG_EXT, GL_UNSIGNED_BYTE, GL_RG8_EXT},           // PF_RG8
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+            {GL_NONE},                                           // PF_R8_SNORM
+            {GL_NONE},                                           // PF_RG8_SNORM
+            {GL_NONE},                                           // PF_RGB8_SNORM
+            {GL_NONE},                                           // PF_RGBA8_SNORM
+            {GL_NONE},                                           // PF_R16_SNORM
+            {GL_NONE},                                           // PF_RG16_SNORM
+            {GL_NONE},                                           // PF_RGB16_SNORM
+            {GL_NONE},                                           // PF_RGBA16_SNORM
+#else
             {GL_RED, GL_UNSIGNED_BYTE, GL_R8_SNORM},             // PF_R8_SNORM
             {GL_RG, GL_UNSIGNED_BYTE, GL_RG8_SNORM},             // PF_RG8_SNORM
             {GL_RGB, GL_UNSIGNED_BYTE, GL_RGB8_SNORM},           // PF_RGB8_SNORM
@@ -140,6 +162,7 @@ namespace Ogre {
             {GL_RG, GL_UNSIGNED_SHORT, GL_RG16_SNORM_EXT},       // PF_RG16_SNORM
             {GL_RGB, GL_UNSIGNED_SHORT, GL_RGB16_SNORM_EXT},     // PF_RGB16_SNORM
             {GL_RGBA, GL_UNSIGNED_SHORT, GL_RGBA16_SNORM_EXT},   // PF_RGBA16_SNORM
+#endif
             // the rest are compressed formats that are same
     };
 
@@ -273,12 +296,12 @@ namespace Ogre {
     void GLES2PixelUtil::useSizedFormats()
     {
         memcpy(_pixelFormats, _pixelFormatsSized, sizeof(_pixelFormatsSized));
-#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+
         // disable formats that require swizzling
         _pixelFormats[PF_L8].internalFormat = GL_NONE;
         _pixelFormats[PF_L16].internalFormat = GL_NONE;
         _pixelFormats[PF_BYTE_LA].internalFormat = GL_NONE;
-#endif
+
     }
 
     //-----------------------------------------------------------------------------

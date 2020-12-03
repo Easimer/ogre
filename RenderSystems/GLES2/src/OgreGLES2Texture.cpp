@@ -98,10 +98,10 @@ namespace Ogre {
 
         // Check requested number of mipmaps
         uint32 maxMips = getMaxMipmaps();
-        
+
         if(PixelUtil::isCompressed(mFormat) && (mNumMipmaps == 0))
             mNumRequestedMipmaps = 0;
-        
+
         mNumMipmaps = mNumRequestedMipmaps;
         if (mNumMipmaps > maxMips)
             mNumMipmaps = maxMips;
@@ -111,9 +111,6 @@ namespace Ogre {
 
         // Set texture type
         mRenderSystem->_getStateCacheManager()->bindGLTexture(texTarget, mTextureID);
-
-        if (renderCaps->hasCapability(RSC_DEBUG))
-            OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_TEXTURE, mTextureID, -1, mName.c_str()));
 
         // If we can do automip generation and the user desires this, do so
         mMipmapsHardwareGenerated = !PixelUtil::isCompressed(mFormat);
@@ -167,16 +164,16 @@ namespace Ogre {
         uint32 width = mWidth;
         uint32 height = mHeight;
         uint32 depth = mDepth;
-        
+
         if (PixelUtil::isCompressed(mFormat))
         {
             // Compressed formats
             GLsizei size = static_cast<GLsizei>(PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat));
-            
+
             // Provide temporary buffer filled with zeroes as glCompressedTexImageXD does not
             // accept a 0 pointer like normal glTexImageXD
             // Run through this process for every mipmap to pregenerate mipmap pyramid
-            
+
             std::vector<uint8> tmpdata(size);
             for (uint32 mip = 0; mip <= mNumMipmaps; mip++)
             {
@@ -189,7 +186,7 @@ namespace Ogre {
                                                        );
 #endif
                 size = static_cast<GLsizei>(PixelUtil::getMemorySize(width, height, depth, mFormat));
-                
+
                 switch(mTextureType)
                 {
                     case TEX_TYPE_1D:
@@ -205,7 +202,7 @@ namespace Ogre {
                     case TEX_TYPE_CUBE_MAP:
                         for(int face = 0; face < 6; face++) {
                             OGRE_CHECK_GL_ERROR(glCompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip, internalformat,
-                                width, height, 0, 
+                                width, height, 0,
                                 size, &tmpdata[0]));
                         }
                         break;
@@ -221,7 +218,7 @@ namespace Ogre {
                     case TEX_TYPE_EXTERNAL_OES:
                         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Attempt to create mipmap for TEX_TYPE_EXTERNAL_OES, should never happen", "GLES2Texture::_createGLTexResource");
                 };
-                
+
                 if(width > 1)
                 {
                     width = width / 2;

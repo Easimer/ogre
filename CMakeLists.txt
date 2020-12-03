@@ -286,9 +286,6 @@ elseif (APPLE AND NOT APPLE_IOS)
   else()
     set(CMAKE_OSX_SYSROOT macosx)
   endif()
-
-  # Make sure that the GLES2 render system is disabled for non-iOS Apple builds
-  set(OGRE_BUILD_RENDERSYSTEM_GLES2 FALSE CACHE BOOL "" FORCE)
 endif ()
 
 if(OGRE_BUILD_COMPONENT_MESHLODGENERATOR)
