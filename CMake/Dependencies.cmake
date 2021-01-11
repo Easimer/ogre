@@ -25,14 +25,14 @@ if(CMAKE_CROSSCOMPILING)
     set(CMAKE_FIND_ROOT_PATH ${OGREDEPS_PATH} "${CMAKE_FIND_ROOT_PATH}")
 
     set(CROSS -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE})
-    
+
     if(ANDROID)
         set(CROSS ${CROSS}
             -DANDROID_NATIVE_API_LEVEL=${ANDROID_NATIVE_API_LEVEL}
             -DANDROID_ABI=${ANDROID_ABI}
             -DANDROID_NDK=${ANDROID_NDK})
     endif()
-    
+
     if(APPLE_IOS)
         set(CROSS ${CROSS}
             -DIOS_PLATFORM=${IOS_PLATFORM})
@@ -192,6 +192,10 @@ endif()
 # Find OpenGL ES 2.x
 find_package(OpenGLES2)
 macro_log_feature(OPENGLES2_FOUND "OpenGL ES 2.x" "Support for the OpenGL ES 2.x render system" "http://www.khronos.org/opengles/")
+
+# Find OpenGL ES 2.x Chromium
+find_package(OpenGLES2CHR)
+macro_log_feature(OPENGLES2CHR_FOUND "OpenGL ES 2.x Electron/Chromium" "Support for the OpenGL ES 2.x render system via Electron/Chromium" "http://www.khronos.org/opengles/" FALSE "" "")
 
 # Find DirectX
 if(WIN32)
