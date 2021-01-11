@@ -116,9 +116,7 @@ target_link_libraries(OgreGLSupport PUBLIC OgreMain PRIVATE ${PLATFORM_LIBS})
 target_include_directories(OgreGLSupport PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/GLSL>"
-    "D:/_DEV/ELECTRON/electron-gn/src"
-    "D:/_DEV/ELECTRON/electron-gn/src/gpu"
-    "D:/_DEV/ELECTRON/electron-gn/src/third_party/khronos"
+    ${OPENGLES2CHR_INCLUDE_DIR}
     PRIVATE "$<BUILD_INTERFACE:${NATIVE_INCLUDES}>")
 
 set_property(TARGET OgreGLSupport PROPERTY POSITION_INDEPENDENT_CODE ON)
