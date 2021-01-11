@@ -168,7 +168,7 @@ function(ogre_config_lib LIBNAME EXPORT)
 	endif ()
   endif (OGRE_STATIC)
   ogre_install_target(${LIBNAME} "" ${EXPORT})
-  
+
   if (OGRE_INSTALL_PDB)
     # install debug pdb files
     if (OGRE_STATIC)
@@ -281,7 +281,7 @@ function(ogre_config_sample_common SAMPLENAME)
   if (OGRE_PROJECT_FOLDERS)
     set_property(TARGET ${LIBNAME} PROPERTY FOLDER Samples)
   endif ()
-  
+
   if (APPLE)
     # On OS X, create .app bundle
     set_property(TARGET ${SAMPLENAME} PROPERTY MACOSX_BUNDLE TRUE)
@@ -309,7 +309,7 @@ function(ogre_config_sample_common SAMPLENAME)
   if (OGRE_INSTALL_SAMPLES AND NOT OGRE_STATIC)
 	ogre_install_target(${SAMPLENAME} ${OGRE_SAMPLE_PATH} FALSE)
   endif()
-  
+
 endfunction(ogre_config_sample_common)
 
 function(ogre_config_sample_exe SAMPLENAME)
@@ -380,6 +380,6 @@ function(ogre_config_tool TOOLNAME)
         CONFIGURATIONS RelWithDebInfo
         )
     endif ()
-  endif ()	
+  endif ()
 
 endfunction(ogre_config_tool)
