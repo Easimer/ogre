@@ -60,7 +60,7 @@ namespace Ogre {
 		GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, &staticVar, &hInst);
 
         mWindow = 0;
-        mClosed = false;        
+        mClosed = false;
         mColourDepth = mIsFullScreen? 32 : GetDeviceCaps(GetDC(0), BITSPIXEL);
         HWND parent = 0;
         bool vsync = false;
@@ -74,7 +74,7 @@ namespace Ogre {
         if (!mIsExternal)
         {
             DWORD         dwStyle = WS_VISIBLE | WS_CLIPCHILDREN;
-            DWORD         dwStyleEx = 0;                    
+            DWORD         dwStyleEx = 0;
             MONITORINFOEX monitorInfoEx;
             RECT          rc;
 
@@ -92,7 +92,7 @@ namespace Ogre {
                 hMonitor = MonitorFromPoint(windowAnchorPoint, MONITOR_DEFAULTTONEAREST);
             }
 
-            // Get the target monitor info      
+            // Get the target monitor info
             memset(&monitorInfoEx, 0, sizeof(MONITORINFOEX));
             monitorInfoEx.cbSize = sizeof(MONITORINFOEX);
             GetMonitorInfo(hMonitor, &monitorInfoEx);
@@ -100,12 +100,12 @@ namespace Ogre {
             //size_t devNameLen = strlen(monitorInfoEx.szDevice);
             //mDeviceName = new char[devNameLen + 1];
 
-            //strcpy(mDeviceName, monitorInfoEx.szDevice);          
+            //strcpy(mDeviceName, monitorInfoEx.szDevice);
 
 
             // No specified top left -> Center the window in the middle of the monitor
             if (left == -1 || top == -1)
-            {               
+            {
                 int screenw = monitorInfoEx.rcMonitor.right  - monitorInfoEx.rcMonitor.left;
                 int screenh = monitorInfoEx.rcMonitor.bottom - monitorInfoEx.rcMonitor.top;
 
@@ -142,10 +142,10 @@ namespace Ogre {
                 dwStyle |= WS_POPUP;
                 dwStyleEx |= WS_EX_TOPMOST;
                 mTop = monitorInfoEx.rcMonitor.top;
-                mLeft = monitorInfoEx.rcMonitor.left;                                           
+                mLeft = monitorInfoEx.rcMonitor.left;
             }
             else
-            {               
+            {
                 if (parent)
                 {
                     dwStyle |= WS_CHILD;
@@ -175,17 +175,17 @@ namespace Ogre {
 
                     // Clamp window rect to the nearest display monitor.
                     if (mLeft < monitorInfoEx.rcMonitor.left)
-                        mLeft = monitorInfoEx.rcMonitor.left;       
+                        mLeft = monitorInfoEx.rcMonitor.left;
 
-                    if (mTop < monitorInfoEx.rcMonitor.top)                 
-                        mTop = monitorInfoEx.rcMonitor.top;                 
+                    if (mTop < monitorInfoEx.rcMonitor.top)
+                        mTop = monitorInfoEx.rcMonitor.top;
 
-                    if ((int)mWidth > monitorInfoEx.rcMonitor.right - mLeft)                    
-                        mWidth = monitorInfoEx.rcMonitor.right - mLeft; 
+                    if ((int)mWidth > monitorInfoEx.rcMonitor.right - mLeft)
+                        mWidth = monitorInfoEx.rcMonitor.right - mLeft;
 
-                    if ((int)mHeight > monitorInfoEx.rcMonitor.bottom - mTop)                   
-                        mHeight = monitorInfoEx.rcMonitor.bottom - mTop;        
-                }           
+                    if ((int)mHeight > monitorInfoEx.rcMonitor.bottom - mTop)
+                        mHeight = monitorInfoEx.rcMonitor.bottom - mTop;
+                }
             }
 
             // register class and create window
@@ -215,7 +215,7 @@ namespace Ogre {
                         displayDeviceMode.dmFields ^= DM_DISPLAYFREQUENCY;
                     }
                 }
-                if (ChangeDisplaySettingsEx(mDeviceName, &displayDeviceMode, NULL, CDS_FULLSCREEN, NULL) != DISP_CHANGE_SUCCESSFUL)                             
+                if (ChangeDisplaySettingsEx(mDeviceName, &displayDeviceMode, NULL, CDS_FULLSCREEN, NULL) != DISP_CHANGE_SUCCESSFUL)
                     LogManager::getSingleton().logMessage(LML_CRITICAL, "ChangeDisplaySettings failed");
 */
 
@@ -243,13 +243,13 @@ namespace Ogre {
 
         mNativeDisplay = GetDC(mWindow);
         mEglDisplay = eglGetDisplay(mNativeDisplay);
-        
-        // fallback for some emulations 
+
+        // fallback for some emulations
         if (mEglDisplay == EGL_NO_DISPLAY)
         {
             mEglDisplay = eglGetDisplay( EGL_DEFAULT_DISPLAY );
         }
-        
+
         eglInitialize(mEglDisplay, NULL, NULL);
 
         eglBindAPI(EGL_OPENGL_ES_API);
@@ -265,8 +265,8 @@ namespace Ogre {
 		// Case window resized.
 		if (width != mWidth || height != mHeight)
 		{
-			mWidth  = rc.right - rc.left;
-			mHeight = rc.bottom - rc.top;
+			mWidth  = width;
+			mHeight = height;
 
 			// Notify viewports of resize
 			ViewportList::iterator it = mViewportList.begin();
@@ -279,7 +279,7 @@ namespace Ogre {
     {
 		if (!mWindow || IsIconic(mWindow))
 			return;
-		
+
 		RECT rc;
 		BOOL result;
 
@@ -310,7 +310,22 @@ namespace Ogre {
 		unsigned int width = rc.right - rc.left;
 		unsigned int height = rc.bottom - rc.top;
 
-        resize(width, height);
+		// Case window resized.
+		if (width != mWidth || height != mHeight)
+		{
+			mWidth  = rc.right - rc.left;
+			mHeight = rc.bottom - rc.top;
+
+			// Notify viewports of resize
+			ViewportList::iterator it = mViewportList.begin();
+			while( it != mViewportList.end() )
+				(*it++).second->_updateDimensions();
+		}
+    }
+
+    void Win32EGLWindow::switchFullScreen( bool fullscreen )
+    {
+
     }
 
     void Win32EGLWindow::create(const String& name, uint width, uint height,
