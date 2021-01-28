@@ -242,7 +242,13 @@ namespace Ogre {
 
         if (checkExtension("GL_IMG_texture_compression_pvrtc") ||
             checkExtension("GL_EXT_texture_compression_dxt1") ||
+            checkExtension("GL_ANGLE_texture_compression_dxt1") ||
+            checkExtension("GL_ANGLE_texture_compression_dxt3") ||
+            checkExtension("GL_ANGLE_texture_compression_dxt5") ||
             checkExtension("GL_EXT_texture_compression_s3tc") ||
+            checkExtension("GL_EXT_texture_compression_s3tc_srgb") ||
+            checkExtension("GL_EXT_texture_compression_rgtc") ||
+            checkExtension("GL_EXT_texture_compression_bptc") ||
             checkExtension("GL_OES_compressed_ETC1_RGB8_texture") ||
             checkExtension("GL_AMD_compressed_ATC_texture") ||
             checkExtension("WEBGL_compressed_texture_s3tc") ||
@@ -262,7 +268,9 @@ namespace Ogre {
 
             if((checkExtension("GL_EXT_texture_compression_dxt1") &&
                checkExtension("GL_EXT_texture_compression_s3tc")) ||
-               checkExtension("WEBGL_compressed_texture_s3tc"))
+               checkExtension("WEBGL_compressed_texture_s3tc") ||
+               (checkExtension("GL_ANGLE_texture_compression_dxt1") &&
+                checkExtension("GL_EXT_texture_compression_s3tc_srgb")))
                 rsc->setCapability(RSC_TEXTURE_COMPRESSION_DXT);
 
             if(checkExtension("GL_OES_compressed_ETC1_RGB8_texture") ||
@@ -279,6 +287,12 @@ namespace Ogre {
             if(checkExtension("WEBGL_compressed_texture_astc") ||
                checkExtension("GL_KHR_texture_compression_astc_ldr"))
                 rsc->setCapability(RSC_TEXTURE_COMPRESSION_ASTC);
+
+            if (checkExtension("GL_EXT_texture_compression_rgtc"))
+              rsc->setCapability(RSC_TEXTURE_COMPRESSION_BC4_BC5);
+
+            if (checkExtension("GL_EXT_texture_compression_bptc"))
+              rsc->setCapability(RSC_TEXTURE_COMPRESSION_BC6H_BC7);
         }
 
         // Check for Anisotropy support

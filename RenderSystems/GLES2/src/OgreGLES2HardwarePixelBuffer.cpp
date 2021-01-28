@@ -182,7 +182,7 @@ namespace Ogre {
 
         bool hasGLES30 = rs->hasMinGLVersion(3, 0);
         // PBO handling is broken
-#if 0// OGRE_NO_GLES3_SUPPORT == 0
+#if 1
         // Calculate size for all mip levels of the texture
         size_t dataSize = 0;
         if(mTarget == GL_TEXTURE_2D_ARRAY)
@@ -195,7 +195,7 @@ namespace Ogre {
         }
 
         // Upload data to PBO
-        GLES2HardwareBuffer buffer(GL_PIXEL_UNPACK_BUFFER, dataSize, mUsage);
+        GLES2HardwareBuffer buffer(GL_PIXEL_UNPACK_BUFFER, dataSize, mUsage, false);
         buffer.writeData(0, dataSize, data.data, false);
 
         void* pdata = NULL;
