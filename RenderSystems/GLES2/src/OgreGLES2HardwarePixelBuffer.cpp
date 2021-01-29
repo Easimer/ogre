@@ -195,7 +195,7 @@ namespace Ogre {
         }
 
         // Upload data to PBO
-        GLES2HardwareBuffer buffer(GL_PIXEL_UNPACK_BUFFER, dataSize, mUsage, false);
+        GLES2HardwareBuffer buffer(GL_PIXEL_UNPACK_BUFFER, dataSize, mUsage);
         buffer.writeData(0, dataSize, data.data, false);
 
         void* pdata = NULL;
