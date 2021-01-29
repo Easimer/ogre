@@ -263,16 +263,11 @@ namespace Ogre {
     void Win32EGLWindow::resize( unsigned int width, unsigned int height )
     {
 		// Case window resized.
-		if (width != mWidth || height != mHeight)
-		{
-			mWidth  = width;
-			mHeight = height;
-
-			// Notify viewports of resize
-			ViewportList::iterator it = mViewportList.begin();
-			while( it != mViewportList.end() )
-				(*it++).second->_updateDimensions();
-		}
+        if (width != mWidth || height != mHeight)
+        {
+            mWidth = width;
+            mHeight = height;
+        }
     }
 
     void Win32EGLWindow::windowMovedOrResized()
