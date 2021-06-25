@@ -44,7 +44,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     bool FileSystemLayer::fileExists(const Ogre::String& path)
     {
-        return false;
+        return true;
     }
     //---------------------------------------------------------------------
     bool FileSystemLayer::removeDirectory(const Ogre::String& path)
