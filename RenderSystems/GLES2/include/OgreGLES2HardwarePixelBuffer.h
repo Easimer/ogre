@@ -86,7 +86,9 @@ namespace Ogre {
             void blit(const HardwarePixelBufferSharedPtr &src, const Box &srcBox, const Box &dstBox);
             // Blitting implementation
             void blitFromTexture(GLES2TextureBuffer *src, const Box &srcBox, const Box &dstBox);
-            
+
+            GLuint textureId() const noexcept { return mTextureID; }
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
         // Friends.
         protected:
