@@ -489,7 +489,7 @@ namespace Ogre {
         typedef std::vector<HardwarePixelBufferSharedPtr> SurfaceList;
         SurfaceList mSurfaceList;
 
-        void readImage(LoadedImages& imgs, const String& name, const String& ext, bool haveNPOT);
+        bool readImage(LoadedImages& imgs, const String& name, const String& ext, bool haveNPOT, bool throwOnFailure = true);
 
         void prepareImpl();
         void unprepareImpl();

@@ -441,22 +441,28 @@ namespace Ogre {
     {
     }
 
-    void Texture::readImage(LoadedImages& imgs, const String& name, const String& ext, bool haveNPOT)
+    bool Texture::readImage(LoadedImages& imgs, const String& name, const String& ext, bool haveNPOT, bool throwOnFailure)
     {
-        DataStreamPtr dstream = ResourceGroupManager::getSingleton().openResource(name, mGroup, this);
+        DataStreamPtr dstream = ResourceGroupManager::getSingleton().openResource(name, mGroup, this, throwOnFailure);
+        if (!dstream)
+        {
+            return false;
+        }
 
         imgs.push_back(Image());
         Image& img = imgs.back();
         img.load(dstream, ext);
 
         if( haveNPOT )
-            return;
+            return true;
 
         // Scale to nearest power of 2
         uint32 w = Bitwise::firstPO2From(img.getWidth());
         uint32 h = Bitwise::firstPO2From(img.getHeight());
         if((img.getWidth() != w) || (img.getHeight() != h))
             img.resize(w, h);
+
+        return true;
     }
 
     void Texture::prepareImpl(void)
@@ -474,35 +480,42 @@ namespace Ogre {
         StringUtil::splitBaseFilename(mName, baseName, ext);
 
         LoadedImages loadedImages;
+        bool fileFound = true;
 
-        try
+        if (mLayerNames.empty())
         {
-            if(mLayerNames.empty())
-            {
-                readImage(loadedImages, mName, ext, haveNPOT);
+            if (!readImage(loadedImages, mName, ext, haveNPOT, false)) {
+            fileFound = false;
+            }
 
-                // If this is a volumetric texture set the texture type flag accordingly.
-                // If this is a cube map, set the texture type flag accordingly.
-                if (loadedImages[0].hasFlag(IF_CUBEMAP))
-                    mTextureType = TEX_TYPE_CUBE_MAP;
-                // If this is a volumetric texture set the texture type flag accordingly.
-                if (loadedImages[0].getDepth() > 1 && mTextureType != TEX_TYPE_2D_ARRAY)
-                    mTextureType = TEX_TYPE_3D;
+            if (fileFound) {
+            // If this is a volumetric texture set the texture type flag
+            // accordingly. If this is a cube map, set the texture type flag
+            // accordingly.
+            if (loadedImages[0].hasFlag(IF_CUBEMAP))
+                mTextureType = TEX_TYPE_CUBE_MAP;
+            // If this is a volumetric texture set the texture type flag
+            // accordingly.
+            if (loadedImages[0].getDepth() > 1 &&
+                mTextureType != TEX_TYPE_2D_ARRAY)
+                mTextureType = TEX_TYPE_3D;
             }
         }
-        catch(const FileNotFoundException&)
-        {
+
+        if(!fileFound) {
             if(mTextureType == TEX_TYPE_CUBE_MAP)
             {
                 mLayerNames.resize(6);
-                for (size_t i = 0; i < 6; i++)
+                for (size_t i = 0; i < 6; i++) {
                     mLayerNames[i] = StringUtil::format("%s%s.%s", baseName.c_str(), CUBEMAP_SUFFIXES[i], ext.c_str());
+                }
             }
             else if (mTextureType == TEX_TYPE_2D_ARRAY)
             { // ignore
             }
-            else
-                throw; // rethrow
+            else {
+                OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND, "File " + mName + " not found");
+            }
         }
 
         // read sub-images
