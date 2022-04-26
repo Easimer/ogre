@@ -210,8 +210,7 @@ namespace Ogre {
             }
 
             // Drawbuffer extension supported, use it
-            if(!isDepth)
-                OGRE_CHECK_GL_ERROR(glDrawBuffersEXT(n, bufs));
+			OGRE_CHECK_GL_ERROR(glDrawBuffersEXT(n, bufs));
         }
         // Check status
         GLuint status;
