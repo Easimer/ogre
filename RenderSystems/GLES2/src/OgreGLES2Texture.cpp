@@ -253,7 +253,6 @@ namespace Ogre {
             {
                 case TEX_TYPE_1D:
                 case TEX_TYPE_2D:
-                case TEX_TYPE_2D_RECT:
                     OGRE_CHECK_GL_ERROR(glTexStorage2DEXT(texTarget, GLsizei(mNumMipmaps+1), internalformat, GLsizei(width), GLsizei(height)));
                     break;
                 case TEX_TYPE_CUBE_MAP:
