@@ -318,11 +318,6 @@ namespace Ogre {
 		}
     }
 
-    void Win32EGLWindow::switchFullScreen( bool fullscreen )
-    {
-
-    }
-
     void Win32EGLWindow::create(const String& name, uint width, uint height,
                                 bool fullScreen, const NameValuePairList *miscParams)
     {
@@ -403,8 +398,6 @@ namespace Ogre {
                 mIsExternalGLControl = StringConverter::parseBool(opt->second);
             }
         }
-
-        initNativeCreatedWindow(miscParams);
 
         if (mWindow)
         {

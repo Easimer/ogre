@@ -58,36 +58,6 @@ namespace Ogre {
 
     EGLDisplay EGLSupport::getGLDisplay(void)
     {
-#if defined(EGL_VERSION_1_5) && OGRE_PLATFORM != OGRE_PLATFORM_ANDROID && OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
-        static auto eglQueryDevicesEXT = (PFNEGLQUERYDEVICESEXTPROC)eglGetProcAddress("eglQueryDevicesEXT");
-        static auto eglQueryDeviceStringEXT =
-            (PFNEGLQUERYDEVICESTRINGEXTPROC)eglGetProcAddress("eglQueryDeviceStringEXT");
-
-        if(eglQueryDevicesEXT && mNativeDisplay == EGL_DEFAULT_DISPLAY)
-        {
-            int numDevices;
-            eglQueryDevicesEXT(0, NULL, &numDevices);
-            EGL_CHECK_ERROR
-            std::vector<EGLDeviceEXT> devices(numDevices);
-            eglQueryDevicesEXT(numDevices, devices.data(), &numDevices);
-
-            EGLAttrib attribs[] = {EGL_NONE};
-            for(auto dev : devices)
-            {
-                EGLDisplay display = eglGetPlatformDisplay(EGL_PLATFORM_DEVICE_EXT, dev, attribs);
-                EGL_CHECK_ERROR
-
-                if(display != EGL_NO_DISPLAY && !mGLDisplay)
-                {
-                    mGLDisplay = display;
-                    const char* exts = eglQueryDeviceStringEXT(dev, EGL_EXTENSIONS);
-                    LogManager::getSingleton().stream() << "EGL: using default display. Device extensions: " << exts;
-                    break;
-                }
-            }
-        }
-        else
-#endif
         {
             mGLDisplay = eglGetDisplay(mNativeDisplay);
             EGL_CHECK_ERROR
@@ -344,11 +314,6 @@ namespace Ogre {
             EGL_NONE, EGL_NONE,
             EGL_NONE
         };
-
-        if (!eglBindAPI(mContextProfile == CONTEXT_ES ? EGL_OPENGL_ES_API : EGL_OPENGL_API))
-        {
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "eglBindAPI failed");
-        }
 
         if(mContextProfile != CONTEXT_ES) {
             contextAttrs[1] = 4;
