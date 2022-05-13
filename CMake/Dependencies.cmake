@@ -111,7 +111,7 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
     if(MSVC OR EMSCRIPTEN OR MINGW) # other platforms ship zlib
         message(STATUS "Building zlib")
         file(DOWNLOAD 
-            http://zlib.net/zlib-1.2.11.tar.gz
+            https://altushost-swe.dl.sourceforge.net/project/libpng/zlib/1.2.11/zlib-1.2.11.tar.gz
             ${PROJECT_BINARY_DIR}/zlib-1.2.11.tar.gz 
             EXPECTED_MD5 1c9f62f0778697a09d36121ead88e08e)
         execute_process(COMMAND ${CMAKE_COMMAND} 
