@@ -47,7 +47,7 @@ namespace Ogre
         void setVSyncInterval(unsigned int interval);
 
         void copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer);
-        bool requiresTextureFlipping() const { return false; }
+        bool requiresTextureFlipping() const { return mFlipForced; }
         GLContext* getContext() const { return mContext; }
 
     protected:
