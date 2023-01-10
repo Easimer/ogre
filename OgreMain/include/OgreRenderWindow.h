@@ -223,6 +223,8 @@ namespace Ogre
         virtual void _notifySurfaceCreated(void* nativeWindow, void* config = NULL) = 0;
 #endif
 
+        void _forceFlipping() { mFlipForced = true; }
+
     protected:
         bool mIsFullScreen;
         bool mIsPrimary;
@@ -231,6 +233,7 @@ namespace Ogre
         int mLeft;
         int mTop;
         unsigned int mVSyncInterval;
+        bool mFlipForced;
         
         /** Indicates that this is the primary window. Only to be called by
             Ogre::Root
