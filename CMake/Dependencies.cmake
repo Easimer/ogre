@@ -53,6 +53,7 @@ set(BUILD_COMMAND_COMMON ${CMAKE_COMMAND}
   -DCMAKE_INSTALL_PREFIX=${OGREDEPS_PATH}
   -G ${CMAKE_GENERATOR}
   -DCMAKE_GENERATOR_PLATFORM=${CMAKE_GENERATOR_PLATFORM}
+  -DCMAKE_OSX_ARCHITECTURES="x86_64"
   -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
   -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE # allow linking into a shared lib
   ${CROSS})
@@ -83,7 +84,7 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
         --build ${PROJECT_BINARY_DIR}/pugixml-1.12 ${BUILD_COMMAND_OPTS})
 
     #find_package(Freetype)
-    if (NOT FREETYPE_FOUND)
+    # if (NOT FREETYPE_FOUND)
         message(STATUS "Building freetype")
         file(DOWNLOAD
             https://download.savannah.gnu.org/releases/freetype/freetype-2.12.1.tar.gz
@@ -107,7 +108,7 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
             WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/freetype-2.12.1/objs)
         execute_process(COMMAND ${CMAKE_COMMAND}
             --build ${PROJECT_BINARY_DIR}/freetype-2.12.1/objs ${BUILD_COMMAND_OPTS})
-    endif()
+    # endif()
 
     if(MSVC OR MINGW OR SKBUILD) # other platforms dont need this
         message(STATUS "Building SDL2")
@@ -127,7 +128,7 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
             --build ${PROJECT_BINARY_DIR}/SDL2-build ${BUILD_COMMAND_OPTS})
     endif()
 
-    if(MSVC OR MINGW OR SKBUILD) # other platforms dont need this
+    # if(MSVC OR MINGW OR SKBUILD) # other platforms dont need this
       message(STATUS "Building zlib") # only needed for Assimp
       file(DOWNLOAD
           http://zlib.net/zlib-1.2.12.tar.gz
@@ -159,33 +160,35 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
           WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/assimp-5.2.4)
       execute_process(COMMAND ${CMAKE_COMMAND}
         --build ${PROJECT_BINARY_DIR}/assimp-5.2.4 ${BUILD_COMMAND_OPTS})
-    endif()
+    # endif()
 
-    message(STATUS "Building Bullet")
-    file(DOWNLOAD
-        https://github.com/bulletphysics/bullet3/archive/refs/tags/3.24.tar.gz
-        ${PROJECT_BINARY_DIR}/3.24.tar.gz)
-    execute_process(COMMAND ${CMAKE_COMMAND}
-        -E tar xf 3.24.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
-    execute_process(COMMAND ${BUILD_COMMAND_COMMON}
-        -DBUILD_SHARED_LIBS=OFF
-        -DINSTALL_LIBS=ON
-        -DCMAKE_POSITION_INDEPENDENT_CODE=ON
-        -DUSE_MSVC_RUNTIME_LIBRARY_DLL=ON
-        -DBUILD_PYBULLET=OFF
-        -DUSE_DOUBLE_PRECISION=OFF
-        -DBUILD_CPU_DEMOS=OFF
-        -DBUILD_BULLET2_DEMOS=OFF
-        -DBUILD_EXTRAS=OFF
-        -DBUILD_EGL=OFF
-        -DBUILD_ENET=OFF
-        -DBUILD_UNIT_TESTS=OFF
-        -DBUILD_CLSOCKET=OFF
-        ${PROJECT_BINARY_DIR}/bullet3-3.24
-        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/bullet3-3.24)
-    execute_process(COMMAND ${CMAKE_COMMAND}
-        --build ${PROJECT_BINARY_DIR}/bullet3-3.24 ${BUILD_COMMAND_OPTS})
-    set(BULLET_ROOT ${OGREDEPS_PATH})
+    if(0)
+        message(STATUS "Building Bullet")
+        file(DOWNLOAD
+            https://github.com/bulletphysics/bullet3/archive/refs/tags/3.24.tar.gz
+            ${PROJECT_BINARY_DIR}/3.24.tar.gz)
+        execute_process(COMMAND ${CMAKE_COMMAND}
+            -E tar xf 3.24.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+        execute_process(COMMAND ${BUILD_COMMAND_COMMON}
+            -DBUILD_SHARED_LIBS=OFF
+            -DINSTALL_LIBS=ON
+            -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+            -DUSE_MSVC_RUNTIME_LIBRARY_DLL=ON
+            -DBUILD_PYBULLET=OFF
+            -DUSE_DOUBLE_PRECISION=OFF
+            -DBUILD_CPU_DEMOS=OFF
+            -DBUILD_BULLET2_DEMOS=OFF
+            -DBUILD_EXTRAS=OFF
+            -DBUILD_EGL=OFF
+            -DBUILD_ENET=OFF
+            -DBUILD_UNIT_TESTS=OFF
+            -DBUILD_CLSOCKET=OFF
+            ${PROJECT_BINARY_DIR}/bullet3-3.24
+            WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/bullet3-3.24)
+        execute_process(COMMAND ${CMAKE_COMMAND}
+            --build ${PROJECT_BINARY_DIR}/bullet3-3.24 ${BUILD_COMMAND_OPTS})
+        set(BULLET_ROOT ${OGREDEPS_PATH})
+    endif(0)
 endif()
 
 #######################################################################

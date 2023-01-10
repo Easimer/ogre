@@ -133,7 +133,7 @@ namespace Ogre {
         mGLSupport = getGLSupport(GLNativeSupport::CONTEXT_ES);
 
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS && OGRE_PLATFORM != OGRE_PLATFORM_ANDROID && OGRE_PLATFORM != OGRE_PLATFORM_WIN32
-        glsupport = mGLSupport;
+        // glsupport = mGLSupport;
 #endif
 
         initConfigOptions();

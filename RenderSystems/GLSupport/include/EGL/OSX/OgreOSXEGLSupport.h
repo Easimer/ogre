@@ -32,6 +32,7 @@ THE SOFTWARE.
 
 
 #include "OgreEGLSupport.h"
+#include "CoreFoundation/CFBase.h"
 
 namespace Ogre {
     class _OgrePrivate OSXEGLSupport : public EGLSupport
