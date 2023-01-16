@@ -1278,7 +1278,7 @@ namespace Ogre {
 
             do
             {
-                if(numberOfInstances > 1)
+                if(numberOfInstances >= 1)
                 {
                     OGRE_CHECK_GL_ERROR(glDrawElementsInstancedEXT((polyMode == GL_FILL) ? primType : polyMode, static_cast<GLsizei>(op.indexData->indexCount), indexType, pBufferData, static_cast<GLsizei>(numberOfInstances)));
                 }
@@ -1293,7 +1293,7 @@ namespace Ogre {
         {
             do
             {
-                if(numberOfInstances > 1)
+                if(numberOfInstances >= 1)
                 {
                     OGRE_CHECK_GL_ERROR(glDrawArraysInstancedEXT((polyMode == GL_FILL) ? primType : polyMode, 0, static_cast<GLsizei>(op.vertexData->vertexCount), static_cast<GLsizei>(numberOfInstances)));
                 }
