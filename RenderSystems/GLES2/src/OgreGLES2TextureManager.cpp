@@ -82,6 +82,12 @@ namespace Ogre {
             return GLRTTManager::getSingleton().getSupportedAlternative(format);
         }
 
+#if EMSCRIPTEN
+        if(format == PF_A8R8G8B8) {
+            return PF_BYTE_RGBA;
+        }
+#endif /* EMSCRIPTEN */
+
         // format not supported by GLES2: e.g. BGR
         if(GLES2PixelUtil::getGLInternalFormat(format) == GL_NONE)
         {

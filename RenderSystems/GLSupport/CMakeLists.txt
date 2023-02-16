@@ -116,6 +116,8 @@ generate_export_header(OgreGLSupport
     EXPORT_MACRO_NAME _OgreGLExport
     EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/include/OgreGLSupportPrerequisites.h)
 
+install(DIRECTORY include/GLSL/ DESTINATION include/OGRE/RenderSystems/GLES2/GLSLES)
+
 if(OGRE_STATIC)
   ogre_config_lib(OgreGLSupport TRUE)
 endif()
