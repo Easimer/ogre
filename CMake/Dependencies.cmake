@@ -238,6 +238,9 @@ endif()
 find_package(OpenGLES2)
 macro_log_feature(OPENGLES2_FOUND "OpenGL ES 2.x" "Support for the OpenGL ES 2.x render system" "http://www.khronos.org/opengles/")
 
+find_package(OpenGLES2CHR)
+macro_log_feature(OPENGLES2CHR_FOUND "OpenGL ES 2.x Electron" "Support for the OpenGL ES 2.x render system via Electron" "http://www.khronos.org/opengles/" FALSE "" "")
+
 # Find DirectX
 if(WIN32)
 	find_package(DirectX)
