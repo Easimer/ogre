@@ -59,6 +59,8 @@ namespace Ogre {
             void blit(const HardwarePixelBufferSharedPtr &src, const Box &srcBox, const Box &dstBox) override;
             void blitToMemory(const Box &srcBox, const PixelBox &dst) override;
 
+            GLuint textureId() const { return mTextureID; }
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
         // Friends.
         protected:
