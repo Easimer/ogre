@@ -13,6 +13,8 @@
 
 if(EGL_FOUND)
   cmake_dependent_option(OGRE_GLSUPPORT_USE_EGL "use EGL for GL Context Creation instead of GLX/ WGL" TRUE "NOT WIN32" FALSE)
+elseif (OGRE_BUILD_RENDERSYSTEM_GLES2CHROMIUM)
+  option(OGRE_GLSUPPORT_USE_EGL "use EGL for GL Context Creation instead of GLX/ WGL" TRUE)
 endif()
 
 if(ANDROID)
@@ -110,7 +112,7 @@ add_library(OgreGLSupport STATIC
     src/OgreGLVertexArrayObject.cpp
     src/OgreGLWindow.cpp
 )
-target_link_libraries(OgreGLSupport PUBLIC OgreMain PRIVATE ${PLATFORM_LIBS})
+target_link_libraries(OgreGLSupport PUBLIC OgreMain OpenGLES2CHR::OpenGLES2CHR PRIVATE ${PLATFORM_LIBS})
 target_include_directories(OgreGLSupport PUBLIC 
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/GLSL>"
@@ -123,4 +125,8 @@ generate_export_header(OgreGLSupport
 
 if(OGRE_STATIC)
   ogre_config_lib(OgreGLSupport TRUE)
+endif()
+
+if (OGRE_BUILD_RENDERSYSTEM_GLES2CHROMIUM)
+  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/GLSL/ DESTINATION include/OGRE/RenderSystems/GLES2)
 endif()
