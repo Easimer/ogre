@@ -57,8 +57,8 @@ endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/GLSLES/include)
 
-add_library(RenderSystem_GLES2 ${OGRE_LIB_TYPE} ${HEADER_FILES} ${GLESW_HEADERS} ${KHR_HEADERS} ${PLATFORM_HEADERS} ${SOURCE_FILES} ${PLATFORM_SOURCES} ${GLSLES_FILES})
-target_link_libraries(RenderSystem_GLES2 PUBLIC OgreMain ${CMAKE_DL_LIBS} PRIVATE OgreGLSupport OpenGLES2CHR::OpenGLES2CHR)
+add_library(RenderSystem_GLES2 STATIC ${HEADER_FILES} ${GLESW_HEADERS} ${KHR_HEADERS} ${PLATFORM_HEADERS} ${SOURCE_FILES} ${PLATFORM_SOURCES} ${GLSLES_FILES})
+target_link_libraries(RenderSystem_GLES2 PUBLIC OgreMain OgreGLSupport OpenGLES2CHR::OpenGLES2CHR ${CMAKE_DL_LIBS})
 target_include_directories(RenderSystem_GLES2 PUBLIC 
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     $<INSTALL_INTERFACE:include/OGRE/RenderSystems/GLES2>)
@@ -88,8 +88,13 @@ generate_export_header(RenderSystem_GLES2
 
 ogre_config_plugin(RenderSystem_GLES2)
 
+if(OGRE_BUILD_RENDERSYSTEM_GLES2CHROMIUM)
+  set_target_properties(RenderSystem_GLES2 PROPERTIES
+    COMPILE_DEFINITIONS OGRE_GLES2_ANGLE
+  )
+endif()
+
 install(FILES ${HEADER_FILES} ${GLSUPPORT_HEADERS} DESTINATION include/OGRE/RenderSystems/GLES2)
-install(FILES "include/GLES2/gl2ext.h" DESTINATION include/OGRE/RenderSystems/GLES2/GLES2)
 install(FILES ${GLESW_HEADERS} DESTINATION include/OGRE/RenderSystems/GLES2/${GLESW_HEADER_INSTALL})
 install(FILES ${KHR_HEADERS} DESTINATION include/OGRE/RenderSystems/GLES2/KHR)
 install(FILES ${PLATFORM_HEADERS} DESTINATION include/OGRE/RenderSystems/GLES2/${PLATFORM_HEADER_INSTALL})
