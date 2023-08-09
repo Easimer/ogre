@@ -38,6 +38,8 @@
 #include "OgreRoot.h"
 #include "OgreGLNativeSupport.h"
 
+#ifndef OGRE_GLES2_ANGLE
+
 namespace Ogre
 {
     GLSLESProgramPipeline::GLSLESProgramPipeline(const GLShaderList& shaders) :
@@ -292,3 +294,5 @@ namespace Ogre
         } // End for
     }
 }
+
+#endif

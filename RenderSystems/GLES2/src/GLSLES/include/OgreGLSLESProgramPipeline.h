@@ -31,6 +31,7 @@
 #include "OgreGLES2Prerequisites.h"
 #include "OgreGLSLESProgramCommon.h"
 
+#ifndef OGRE_GLES2_ANGLE
 namespace Ogre
 {
     /** Specialisation of HighLevelGpuProgram to provide support for OpenGL 
@@ -82,4 +83,5 @@ namespace Ogre
     };
 }
 
+#endif
 #endif
