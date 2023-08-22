@@ -31,6 +31,13 @@ elseif (EMSCRIPTEN)
   set(NATIVE_INCLUDES 
       ${CMAKE_CURRENT_SOURCE_DIR}/include/EGL 
       ${CMAKE_CURRENT_SOURCE_DIR}/include/EGL/Emscripten)
+elseif (OGRE_BUILD_RENDERSYSTEM_GLES2CHROMIUM)
+  file(GLOB PLATFORM_HEADERS "include/EGL/MaxwhereElectron/*.h" "include/EGL/*.h")
+  file(GLOB PLATFORM_SOURCES "src/EGL/MaxwhereElectron/*.cpp" "src/EGL/*.cpp")
+
+  set(NATIVE_INCLUDES
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/EGL
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/EGL/MaxwhereElectron)
 elseif (WIN32)
   if(OGRE_GLSUPPORT_USE_EGL)
       file(GLOB PLATFORM_HEADERS "include/EGL/WIN32/*.h" "include/EGL/*.h")
@@ -128,5 +135,14 @@ if(OGRE_STATIC)
 endif()
 
 if (OGRE_BUILD_RENDERSYSTEM_GLES2CHROMIUM)
-  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/GLSL/ DESTINATION include/OGRE/RenderSystems/GLES2)
+  install(DIRECTORY ${OPENGLES2CHR_INCLUDE_DIR}/EGL DESTINATION include/OGRE/RenderSystems/GLES2)
+  install(DIRECTORY ${OPENGLES2CHR_INCLUDE_DIR}/GLES2 DESTINATION include/OGRE/RenderSystems/GLES2)
+  install(DIRECTORY ${OPENGLES2CHR_INCLUDE_DIR}/GLES3 DESTINATION include/OGRE/RenderSystems/GLES2)
+  install(DIRECTORY ${OPENGLES2CHR_INCLUDE_DIR}/gpu DESTINATION include/OGRE/RenderSystems/GLES2)
+  install(DIRECTORY ${OPENGLES2CHR_INCLUDE_DIR}/KHR DESTINATION include/OGRE/RenderSystems/GLES2)
+  set_target_properties(OgreGLSupport PROPERTIES
+    COMPILE_DEFINITIONS OGRE_GLES2_ANGLE
+  )
 endif()
+
+ogre_config_plugin(OgreGLSupport)
