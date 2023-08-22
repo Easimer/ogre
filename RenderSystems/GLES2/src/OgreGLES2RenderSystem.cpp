@@ -45,7 +45,9 @@ THE SOFTWARE.
 #endif
 #include "OgreGLSLESLinkProgram.h"
 #include "OgreGLSLESProgramManager.h"
+#ifndef OGRE_GLES2_ANGLE
 #include "OgreGLSLESProgramPipeline.h"
+#endif
 #include "OgreGLES2StateCacheManager.h"
 #include "OgreRenderWindow.h"
 #include "OgreGLES2PixelFormat.h"
@@ -64,9 +66,12 @@ Ogre::GLES2ManagedResourceManager* Ogre::GLES2RenderSystem::mResourceManager = N
 #define GL_PACK_ROW_LENGTH_NV             0x0D02
 #endif
 
+#include "ANGLECompat.h"
+
 using namespace std;
 
 static void gl2ext_to_gl3core() {
+#ifndef OGRE_GLES2_ANGLE
     glUnmapBufferOES = glUnmapBuffer;
     glRenderbufferStorageMultisampleAPPLE = glRenderbufferStorageMultisample;
 
@@ -97,15 +102,18 @@ static void gl2ext_to_gl3core() {
     glBindVertexArrayOES = glBindVertexArray;
     glGenVertexArraysOES = glGenVertexArrays;
     glDeleteVertexArraysOES = glDeleteVertexArrays;
+#endif
 }
 
 namespace Ogre {
 
+#ifndef OGRE_GLES2_ANGLE
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS && OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
     static GLNativeSupport* glsupport;
     static GLESWglProc get_proc(const char* proc) {
         return (GLESWglProc)glsupport->getProcAddress(proc);
     }
+#endif
 #endif
 
     static GLint getCombinedMinMipFilter(FilterOptions min, FilterOptions mip)
@@ -282,7 +290,13 @@ namespace Ogre {
 
         if (checkExtension("GL_IMG_texture_compression_pvrtc") ||
             checkExtension("GL_EXT_texture_compression_dxt1") ||
+            checkExtension("GL_ANGLE_texture_compression_dxt1") ||
+            checkExtension("GL_ANGLE_texture_compression_dxt3") ||
+            checkExtension("GL_ANGLE_texture_compression_dxt5") ||
             checkExtension("GL_EXT_texture_compression_s3tc") ||
+            checkExtension("GL_EXT_texture_compression_s3tc_srgb") ||
+            checkExtension("GL_EXT_texture_compression_rgtc") ||
+            checkExtension("GL_EXT_texture_compression_bptc") ||
             checkExtension("GL_OES_compressed_ETC1_RGB8_texture") ||
             checkExtension("GL_AMD_compressed_ATC_texture") ||
             checkExtension("WEBGL_compressed_texture_s3tc") ||
@@ -300,9 +314,11 @@ namespace Ogre {
                checkExtension("WEBGL_compressed_texture_pvrtc"))
                 rsc->setCapability(RSC_TEXTURE_COMPRESSION_PVRTC);
                 
-            if((checkExtension("GL_EXT_texture_compression_dxt1") &&
-               checkExtension("GL_EXT_texture_compression_s3tc")) ||
-               checkExtension("WEBGL_compressed_texture_s3tc"))
+            if ((checkExtension("GL_EXT_texture_compression_dxt1") &&
+                 checkExtension("GL_EXT_texture_compression_s3tc")) ||
+                checkExtension("WEBGL_compressed_texture_s3tc") ||
+                (checkExtension("GL_ANGLE_texture_compression_dxt1") &&
+                 checkExtension("GL_EXT_texture_compression_s3tc_srgb")))
                 rsc->setCapability(RSC_TEXTURE_COMPRESSION_DXT);
 
             if(checkExtension("GL_OES_compressed_ETC1_RGB8_texture") ||
@@ -319,6 +335,12 @@ namespace Ogre {
             if(checkExtension("WEBGL_compressed_texture_astc") ||
                checkExtension("GL_KHR_texture_compression_astc_ldr"))
                 rsc->setCapability(RSC_TEXTURE_COMPRESSION_ASTC);
+
+            if (checkExtension("GL_EXT_texture_compression_rgtc"))
+                rsc->setCapability(RSC_TEXTURE_COMPRESSION_BC4_BC5);
+
+            if (checkExtension("GL_EXT_texture_compression_bptc"))
+                rsc->setCapability(RSC_TEXTURE_COMPRESSION_BC6H_BC7);
         }
 
         // Check for Anisotropy support
@@ -452,9 +474,11 @@ namespace Ogre {
         else if(checkExtension("GL_ANGLE_instanced_arrays"))
         {
             rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
+#ifndef OGRE_GLES2_ANGLE
             glDrawElementsInstancedEXT = glDrawElementsInstancedANGLE;
             glDrawArraysInstancedEXT = glDrawArraysInstancedANGLE;
             glVertexAttribDivisorEXT = glVertexAttribDivisorANGLE;
+#endif
         }
 
         if (checkExtension("GL_EXT_debug_marker") &&
@@ -1149,7 +1173,7 @@ namespace Ogre {
 
             do
             {
-                if(numberOfInstances > 1)
+                if(numberOfInstances >= 1)
                 {
                     OGRE_CHECK_GL_ERROR(glDrawElementsInstancedEXT((polyMode == GL_FILL) ? primType : polyMode, static_cast<GLsizei>(op.indexData->indexCount), indexType, pBufferData, static_cast<GLsizei>(numberOfInstances)));
                 }
@@ -1164,7 +1188,7 @@ namespace Ogre {
         {
             do
             {
-                if(numberOfInstances > 1)
+                if(numberOfInstances >= 1)
                 {
                     OGRE_CHECK_GL_ERROR(glDrawArraysInstancedEXT((polyMode == GL_FILL) ? primType : polyMode, 0, static_cast<GLsizei>(op.vertexData->vertexCount), static_cast<GLsizei>(numberOfInstances)));
                 }
@@ -1260,8 +1284,10 @@ namespace Ogre {
             setScissorTest(true, vpRect);
         }
 
+#ifndef OGRE_GLES2_ANGLE
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         static_cast<EAGLES2Context*>(mCurrentContext)->mDiscardBuffers = buffers;
+#endif
 #endif
 
         // Clear buffers
@@ -1431,13 +1457,9 @@ namespace Ogre {
         if (mCurrentContext)
             mCurrentContext->setCurrent();
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_WIN32
         // ios: EAGL2Support redirects to glesw for get_proc. Overwriting it there would create an infinite loop
         // android: eglGetProcAddress fails in some cases (e.g. Virtual Device), whereas dlsym always works.
         if (glGetError == NULL && gleswInit())
-#else
-        if (gleswInit2(get_proc))
-#endif
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                         "Could not initialize glesw",

@@ -31,7 +31,7 @@
 #include <GLES3/glesw.h>
 #include <stdio.h>
 
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(OGRE_GLES2_ANGLE)
 #define WIN32_LEAN_AND_MEAN 1
 #include <windows.h>
 
@@ -89,7 +89,7 @@ static GLESWglProc get_proc(const char *proc)
     CFRelease(procname);
     return res;
 }
-#elif defined(__EMSCRIPTEN__)
+#elif defined(__EMSCRIPTEN__) || defined(OGRE_GLES2_ANGLE)
 #include <EGL/egl.h>
 static void open_libgl() {}
 static void close_libgl() {}
@@ -165,6 +165,7 @@ GLESWglProc gleswGetProcAddress(const char *proc)
 	return get_proc(proc);
 }
 
+#ifndef OGRE_GLES2_ANGLE
 PFNGLACTIVESHADERPROGRAMEXTPROC                         gleswActiveShaderProgramEXT;
 PFNGLACTIVETEXTUREPROC                                  gleswActiveTexture;
 PFNGLALPHAFUNCQCOMPROC                                  gleswAlphaFuncQCOM;
@@ -1405,3 +1406,8 @@ static void load_procs(GLESWGetProcAddressProc proc)
 	gleswWaitSyncAPPLE = (PFNGLWAITSYNCAPPLEPROC)proc("glWaitSyncAPPLE");
 	gleswWeightPathsNV = (PFNGLWEIGHTPATHSNVPROC)proc("glWeightPathsNV");
 }
+#else
+// NOTE(danielm): no need to load GL funpointers, they will be dynamically
+// linked
+static void load_procs(GLESWGetProcAddressProc proc) {}
+#endif

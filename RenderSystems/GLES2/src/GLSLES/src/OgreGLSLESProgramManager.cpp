@@ -105,12 +105,14 @@ namespace Ogre {
             // Program object not found for key so need to create it
             if (programFound == mPrograms.end())
             {
+#ifndef OGRE_GLES2_ANGLE
                 if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(
                         RSC_SEPARATE_SHADER_OBJECTS))
                 {
                     mActiveProgram = new GLSLESProgramPipeline(mActiveShader);
                 }
                 else
+#endif
                 {
                     mActiveProgram = new GLSLESLinkProgram(mActiveShader);
                 }

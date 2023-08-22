@@ -39,6 +39,8 @@ THE SOFTWARE.
 #include "OgreGLSLESProgramManager.h"
 #include "OgreGLSLPreprocessor.h"
 
+#include "ANGLECompat.h"
+
 namespace Ogre {
     //-----------------------------------------------------------------------
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER

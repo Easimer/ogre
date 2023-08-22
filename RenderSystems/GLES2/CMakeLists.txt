@@ -89,6 +89,10 @@ generate_export_header(RenderSystem_GLES2
 ogre_config_plugin(RenderSystem_GLES2)
 
 if(OGRE_BUILD_RENDERSYSTEM_GLES2CHROMIUM)
+  # NOTE(danielm): this directory contains OpenGL headers like gl3.h gl2ext.h
+  # and we want those to take precedence over the ones included with Ogre, so
+  # BEFORE is used here
+  target_include_directories(RenderSystem_GLES2 BEFORE PUBLIC ${OPENGLES2CHR_INCLUDE_DIR})
   set_target_properties(RenderSystem_GLES2 PROPERTIES
     COMPILE_DEFINITIONS OGRE_GLES2_ANGLE
   )

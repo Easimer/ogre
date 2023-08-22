@@ -34,6 +34,8 @@
 #include "OgreRoot.h"
 #include "OgreGLNativeSupport.h"
 
+#include "ANGLECompat.h"
+
 namespace Ogre {
     
     //-----------------------------------------------------------------------

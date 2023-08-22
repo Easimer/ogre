@@ -35,6 +35,8 @@ THE SOFTWARE.
 #include "OgreRenderSystem.h"
 #include "OgreGLSLESProgramManager.h"
 
+#include "ANGLECompat.h"
+
 namespace Ogre {
 //-----------------------------------------------------------------------------
     static GLint getR2VBPrimitiveType(RenderOperation::OperationType operationType)

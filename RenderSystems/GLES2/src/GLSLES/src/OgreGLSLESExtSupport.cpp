@@ -32,6 +32,8 @@ THE SOFTWARE.
 #include "OgreGLUtil.h"
 #include "OgreGLES2RenderSystem.h"
 
+#include "ANGLECompat.h"
+
 namespace Ogre
 {
     namespace GLSLES {

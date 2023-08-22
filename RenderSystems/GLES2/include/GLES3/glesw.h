@@ -31,10 +31,22 @@
 #ifndef __glesw_h_
 #define __glesw_h_
 
+#if OGRE_GLES2_ANGLE
+#include <GLES2/gl2chromium.h>
+#include <GLES3/gl3.h>
+#ifndef GL_GLEXT_PROTOTYPES
+#define GL_GLEXT_PROTOTYPES 1
+#endif
+#include <GLES2/gl2ext.h>
+#include <GLES2/gl2extchromium.h>
+#include <KHR/khrplatform.h>
+#include <GLES2/gl2platform.h>
+#else
 #include <GLES3/gl3.h>
 #include <KHR/khrplatform.h>
 #include <GLES3/gl3platform.h>
 #include <GLES2/gl2ext.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,6 +61,7 @@ int gleswInit2(GLESWGetProcAddressProc proc);
 int gleswIsSupported(int major, int minor);
 GLESWglProc gleswGetProcAddress(const char *proc);
 
+#ifndef OGRE_GLES2_ANGLE
 /* OpenGL functions */
 extern PFNGLACTIVESHADERPROGRAMEXTPROC                         gleswActiveShaderProgramEXT;
 extern PFNGLACTIVETEXTUREPROC                                  gleswActiveTexture;
@@ -1286,6 +1299,7 @@ extern PFNGLWEIGHTPATHSNVPROC                                  gleswWeightPathsN
 #define glWaitSync                                             gleswWaitSync
 #define glWaitSyncAPPLE                                        gleswWaitSyncAPPLE
 #define glWeightPathsNV                                        gleswWeightPathsNV
+#endif
 
 #ifdef __cplusplus
 }

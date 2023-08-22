@@ -32,6 +32,15 @@ THE SOFTWARE.
 #include "OgreBitwise.h"
 #include "OgreLogManager.h"
 
+#if OGRE_GLES2_ANGLE
+#undef GL_COMPRESSED_RGBA_S3TC_DXT1_EXT
+#define GL_COMPRESSED_RGBA_S3TC_DXT1_EXT GL_COMPRESSED_RGB_S3TC_DXT1_EXT
+#undef GL_COMPRESSED_RGBA_S3TC_DXT3_EXT
+#define GL_COMPRESSED_RGBA_S3TC_DXT3_EXT GL_COMPRESSED_RGBA_S3TC_DXT3_ANGLE
+#undef GL_COMPRESSED_RGBA_S3TC_DXT5_EXT
+#define GL_COMPRESSED_RGBA_S3TC_DXT5_EXT GL_COMPRESSED_RGBA_S3TC_DXT5_ANGLE
+#endif
+
 namespace Ogre {
     struct GLPixelFormatDescription {
         GLenum format;
@@ -123,6 +132,15 @@ namespace Ogre {
             {GL_RGB_INTEGER, GL_INT, GL_RGB32I},                 // PF_R32G32B32_SINT
             {GL_RGBA_INTEGER, GL_INT, GL_RGBA32I},               // PF_R32G32B32A32_SINT
             {GL_RGB, GL_UNSIGNED_INT_5_9_9_9_REV, GL_RGB9_E5},   // PF_R9G9B9E5_SHAREDEXP
+#if OGRE_GLES2_ANGLE
+            {GL_NONE, GL_NONE, GL_COMPRESSED_RED_RGTC1_EXT},               // PF_BC4_UNORM
+            {GL_NONE, GL_NONE, GL_COMPRESSED_SIGNED_RED_RGTC1_EXT},        // PF_BC4_SNORM
+            {GL_NONE, GL_NONE, GL_COMPRESSED_RED_GREEN_RGTC2_EXT},         // PF_BC5_UNORM
+            {GL_NONE, GL_NONE, GL_COMPRESSED_SIGNED_RED_GREEN_RGTC2_EXT},  // PF_BC5_SNORM
+            {GL_NONE, GL_NONE, GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT_EXT}, // PF_BC6H_UF16
+            {GL_NONE, GL_NONE, GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT_EXT},   // PF_BC6H_SF16
+            {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_BPTC_UNORM_EXT},         // PF_BC7_UNORM
+#else
             {GL_NONE},                                           // PF_BC4_UNORM
             {GL_NONE},                                           // PF_BC4_SNORM
             {GL_NONE},                                           // PF_BC5_UNORM
@@ -130,6 +148,7 @@ namespace Ogre {
             {GL_NONE},                                           // PF_BC6H_UF16
             {GL_NONE},                                           // PF_BC6H_SF16
             {GL_NONE},                                           // PF_BC7_UNORM
+#endif
             {GL_RED_EXT, GL_UNSIGNED_BYTE, GL_R8_EXT},           // PF_R8
             {GL_RG_EXT, GL_UNSIGNED_BYTE, GL_RG8_EXT},           // PF_RG8
             {GL_RED, GL_UNSIGNED_BYTE, GL_R8_SNORM},             // PF_R8_SNORM
@@ -227,6 +246,15 @@ namespace Ogre {
             {GL_NONE},                                           // PF_R32G32B32_SINT
             {GL_NONE},                                           // PF_R32G32B32A32_SINT
             {GL_NONE},                                           // PF_R9G9B9E5_SHAREDEXP
+#if OGRE_GLES2_ANGLE
+            {GL_NONE, GL_NONE, GL_COMPRESSED_RED_RGTC1_EXT},               // PF_BC4_UNORM
+            {GL_NONE, GL_NONE, GL_COMPRESSED_SIGNED_RED_RGTC1_EXT},        // PF_BC4_SNORM
+            {GL_NONE, GL_NONE, GL_COMPRESSED_RED_GREEN_RGTC2_EXT},         // PF_BC5_UNORM
+            {GL_NONE, GL_NONE, GL_COMPRESSED_SIGNED_RED_GREEN_RGTC2_EXT},  // PF_BC5_SNORM
+            {GL_NONE, GL_NONE, GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT_EXT}, // PF_BC6H_UF16
+            {GL_NONE, GL_NONE, GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT_EXT},   // PF_BC6H_SF16
+            {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_BPTC_UNORM_EXT},         // PF_BC7_UNORM
+#else
             {GL_NONE},                                           // PF_BC4_UNORM
             {GL_NONE},                                           // PF_BC4_SNORM
             {GL_NONE},                                           // PF_BC5_UNORM
@@ -234,6 +262,7 @@ namespace Ogre {
             {GL_NONE},                                           // PF_BC6H_UF16
             {GL_NONE},                                           // PF_BC6H_SF16
             {GL_NONE},                                           // PF_BC7_UNORM
+#endif
             {GL_RED_EXT, GL_UNSIGNED_BYTE, GL_RED_EXT},          // PF_R8
             {GL_RG_EXT, GL_UNSIGNED_BYTE, GL_RG_EXT},            // PF_RG8
             {GL_NONE},                                           // PF_R8_SNORM
@@ -273,7 +302,7 @@ namespace Ogre {
     void GLES2PixelUtil::useSizedFormats()
     {
         memcpy(_pixelFormats, _pixelFormatsSized, sizeof(_pixelFormatsSized));
-#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+#if OGRE_GLES2_ANGLE || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
         // disable formats that require swizzling
         _pixelFormats[PF_L8].internalFormat = GL_NONE;
         _pixelFormats[PF_L16].internalFormat = GL_NONE;

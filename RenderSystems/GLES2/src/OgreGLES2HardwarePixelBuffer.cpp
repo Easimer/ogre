@@ -39,12 +39,16 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreGLSLESProgramManager.h"
 #include "OgreGLSLESLinkProgram.h"
+#ifndef OGRE_GLES2_ANGLE
 #include "OgreGLSLESProgramPipeline.h"
+#endif
 #include "OgreBitwise.h"
 #include "OgreGLNativeSupport.h"
 #include "OgreGLES2HardwareBuffer.h"
 #include "OgreGLES2Texture.h"
 #include "OgreLogManager.h"
+
+#include "ANGLECompat.h"
 
 namespace Ogre {
     void GLES2TextureBuffer::_blitFromMemory(const PixelBox &src, const Box &dst)
@@ -330,7 +334,12 @@ namespace Ogre {
         {
             case GL_TEXTURE_2D:
             case GL_TEXTURE_CUBE_MAP:
+#if OGRE_GLES2_ANGLE
+                OGRE_CHECK_GL_ERROR(glFramebufferTexture2DMultisampleEXT(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                                                                         GL_TEXTURE_2D, mTextureID, 0, 4));
+#else
                 OGRE_CHECK_GL_ERROR(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mTextureID, 0));
+#endif
                 OGRE_CHECK_GL_ERROR(glCheckFramebufferStatus(GL_FRAMEBUFFER));
                 OGRE_CHECK_GL_ERROR(glReadPixels(0, 0, data.getWidth(), data.getHeight(),
                                                  GL_RGBA,
@@ -480,7 +489,11 @@ namespace Ogre {
         // Allocate storage for depth buffer
         if (mNumSamples > 0)
         {
+#if OGRE_GLES2_ANGLE
+            if(rs->hasMinGLVersion(3, 0) || rs->checkExtension("GL_CHROMIUM_framebuffer_multisample"))
+#else
             if(rs->hasMinGLVersion(3, 0) || rs->checkExtension("GL_APPLE_framebuffer_multisample"))
+#endif
             {
                 OGRE_CHECK_GL_ERROR(glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER,
                                                                           mNumSamples, mGLInternalFormat, mWidth, mHeight));

@@ -134,18 +134,26 @@ namespace Ogre {
         GL_NONE,
         GL_DEPTH_COMPONENT16
         , GL_DEPTH_COMPONENT24_OES   // Prefer 24 bit depth
+#if OGRE_GLES2_ANGLE && OGRE_PLATFORM != OGRE_PLATFORM_APPLE
         , GL_DEPTH_COMPONENT32_OES
+#endif
         , GL_DEPTH24_STENCIL8_OES    // Packed depth / stencil
+#if OGRE_GLES2_ANGLE && OGRE_PLATFORM != OGRE_PLATFORM_APPLE
         , GL_DEPTH32F_STENCIL8
+#endif
     };
     static const uchar depthBits[] =
     {
         0
         ,16
         ,24
+#if OGRE_GLES2_ANGLE && OGRE_PLATFORM != OGRE_PLATFORM_APPLE
         ,32
+#endif
         ,24
+#if OGRE_GLES2_ANGLE && OGRE_PLATFORM != OGRE_PLATFORM_APPLE
         ,32
+#endif
     };
     #define DEPTHFORMAT_COUNT (sizeof(depthFormats)/sizeof(GLenum))
 
@@ -159,7 +167,11 @@ namespace Ogre {
         if(getGLES2RenderSystem()->hasMinGLVersion(3, 0))
         {
             // Check samples supported
+#if OGRE_GLES2_ANGLE
+            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_SAMPLES_EXT, &mMaxFSAASamples));
+#else
             OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_SAMPLES_APPLE, &mMaxFSAASamples));
+#endif
         }
     }
 
@@ -309,7 +321,7 @@ namespace Ogre {
     {
         GLES2RenderSystem* rs = getGLES2RenderSystem();
         bool hasGLES3 = rs->hasMinGLVersion(3, 0);
-#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+#if 0
         memset(mProps, 0, sizeof(mProps));
 
         // TODO: Fix that probing all formats slows down startup not just on the web also on Android / iOS
@@ -498,13 +510,14 @@ namespace Ogre {
     GLES2FBORenderTexture *GLES2FBOManager::createRenderTexture(const String &name, 
         const GLSurfaceDesc &target, bool writeGamma, uint fsaa)
     {
+        writeGamma = false;
         GLES2FBORenderTexture *retval = new GLES2FBORenderTexture(this, name, target, writeGamma, fsaa);
         return retval;
     }
 
     void GLES2FBOManager::bind(RenderTarget *target)
     {
-        if(auto fbo = dynamic_cast<GLRenderTarget*>(target)->getFBO())
+        if (auto fbo = dynamic_cast<GLRenderTarget*>(target)->getFBO())
             fbo->bind(true);
         else
         {

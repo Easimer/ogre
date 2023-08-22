@@ -35,6 +35,8 @@ THE SOFTWARE.
 #include "OgreGLES2RenderSystem.h"
 #include "OgreGLNativeSupport.h"
 
+#include "ANGLECompat.h"
+
 namespace Ogre {
 
 //-----------------------------------------------------------------------------

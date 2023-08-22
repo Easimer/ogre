@@ -35,6 +35,8 @@ THE SOFTWARE.
 #include "OgreTextureManager.h"
 #include "OgreLogManager.h"
 
+#include "ANGLECompat.h"
+
 namespace Ogre {
     GLES2Texture::GLES2Texture(ResourceManager* creator, const String& name,
                              ResourceHandle handle, const String& group, bool isManual,
@@ -73,6 +75,7 @@ namespace Ogre {
 
     void GLES2Texture::_createGLTexResource()
     {
+        GLES2RenderSystem* rs = getGLES2RenderSystem();
         const RenderSystemCapabilities *renderCaps =
                 Root::getSingleton().getRenderSystem()->getCapabilities();
 
@@ -112,8 +115,13 @@ namespace Ogre {
         if((mUsage & TU_AUTOMIPMAP) && mMipmapsHardwareGenerated && mNumRequestedMipmaps)
             mNumMipmaps = getMaxMipmaps();
 
+        #if OGRE_GLES2_ANGLE
+        if(mRenderSystem->hasMinGLVersion(3, 0))
+            mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_MAX_LEVEL, mNumRequestedMipmaps ? mNumMipmaps + 1 : 0);
+        #else
         if(mRenderSystem->hasMinGLVersion(3, 0) || mRenderSystem->checkExtension("GL_APPLE_texture_max_level"))
             mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_MAX_LEVEL_APPLE, mNumRequestedMipmaps ? mNumMipmaps + 1 : 0);
+        #endif
 
         if(mTextureType == TEX_TYPE_EXTERNAL_OES && mNumRequestedMipmaps > 0) {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Mipmaps are not available for TEX_TYPE_EXTERNAL_OES", "GLES2Texture::_createGLTexResource");
@@ -122,6 +130,7 @@ namespace Ogre {
         bool hasGLES30 = mRenderSystem->hasMinGLVersion(3, 0);
 
         // Set up texture swizzling (not available in WebGL2)
+#if !OGRE_GLES2_ANGLE
         if (hasGLES30 && (OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN))
         {
             if(PixelUtil::isLuminance(mFormat))
@@ -149,6 +158,14 @@ namespace Ogre {
                 OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_A, GL_RED));
             }
         }
+#endif
+
+#if OGRE_GLES2_ANGLE
+        if ((mUsage & TU_RENDERTARGET) && rs->checkExtension("GL_ANGLE_texture_usage"))
+        {
+            OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_USAGE_ANGLE, GL_FRAMEBUFFER_ATTACHMENT_ANGLE));
+        }
+#endif
 
         // Allocate internal buffer so that glTexSubImageXD can be used
         // Internal format
