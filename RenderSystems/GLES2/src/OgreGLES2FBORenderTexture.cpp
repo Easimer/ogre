@@ -134,26 +134,18 @@ namespace Ogre {
         GL_NONE,
         GL_DEPTH_COMPONENT16
         , GL_DEPTH_COMPONENT24_OES   // Prefer 24 bit depth
-#if OGRE_GLES2_ANGLE && OGRE_PLATFORM != OGRE_PLATFORM_APPLE
-        , GL_DEPTH_COMPONENT32_OES
-#endif
+        , GL_DEPTH_COMPONENT32F
         , GL_DEPTH24_STENCIL8_OES    // Packed depth / stencil
-#if OGRE_GLES2_ANGLE && OGRE_PLATFORM != OGRE_PLATFORM_APPLE
         , GL_DEPTH32F_STENCIL8
-#endif
     };
     static const uchar depthBits[] =
     {
         0
         ,16
         ,24
-#if OGRE_GLES2_ANGLE && OGRE_PLATFORM != OGRE_PLATFORM_APPLE
         ,32
-#endif
         ,24
-#if OGRE_GLES2_ANGLE && OGRE_PLATFORM != OGRE_PLATFORM_APPLE
         ,32
-#endif
     };
     #define DEPTHFORMAT_COUNT (sizeof(depthFormats)/sizeof(GLenum))
 
@@ -327,12 +319,16 @@ namespace Ogre {
         // TODO: Fix that probing all formats slows down startup not just on the web also on Android / iOS
         mProps[PF_A8B8G8R8].valid = true;
         FormatProperties::Mode mode = {1, 0};
+        FormatProperties::Mode modeD32F = {3, 0};
         mProps[PF_A8B8G8R8].modes.push_back(mode);
+        mProps[PF_A8B8G8R8].modes.push_back(modeD32F);
 
         if(hasGLES3)
         {
             mProps[PF_DEPTH16].valid = true;
             mProps[PF_DEPTH16].modes.push_back(mode);
+            mProps[PF_DEPTH32F].valid = true;
+            mProps[PF_DEPTH32F].modes.push_back(modeD32F);
         }
         LogManager::getSingleton().logMessage("[GLES2] : detectFBOFormats is disabled on this platform (due performance reasons)");
 #else
@@ -494,7 +490,9 @@ namespace Ogre {
             if(depthFormats[props.modes[mode].depth] == GL_DEPTH24_STENCIL8_OES) // Prefer 24/8 packed
                 desirability += 5000;
             if(depthFormats[props.modes[mode].depth] == GL_DEPTH32F_STENCIL8) // Prefer 32F/8 packed
-                desirability += 5000;
+                desirability += 6000;
+            if(depthFormats[props.modes[mode].depth] == GL_DEPTH_COMPONENT32F) // Prefer 32F/8 packed
+                desirability += 6000;
             desirability += stencilBits[props.modes[mode].stencil] + depthBits[props.modes[mode].depth];
             
             if(desirability > bestscore)
