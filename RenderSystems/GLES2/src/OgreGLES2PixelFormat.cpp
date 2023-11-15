@@ -265,9 +265,15 @@ namespace Ogre {
             {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_ASTC_10x10_KHR},// PF_ASTC_RGBA_10X10_LDR
             {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_ASTC_12x10_KHR},// PF_ASTC_RGBA_12X10_LDR
             {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_ASTC_12x12_KHR},// PF_ASTC_RGBA_12X12_LDR
+#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+            {GL_NONE, GL_NONE, GL_NONE}, // PF_DEPTH32
+            {GL_DEPTH_COMPONENT, GL_FLOAT, GL_DEPTH_COMPONENT32F}, // PF_DEPTH32F
+            {GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, GL_DEPTH24_STENCIL8}, // PF_DEPTH24_STENCIL8
+#else
             {GL_NONE, GL_NONE, GL_NONE}, // PF_DEPTH32
             {GL_NONE, GL_NONE, GL_NONE}, // PF_DEPTH32F
             {GL_NONE, GL_NONE, GL_NONE}, // PF_DEPTH24_STENCIL8
+#endif
     };
 
     void GLES2PixelUtil::useSizedFormats()
@@ -332,11 +338,15 @@ namespace Ogre {
         switch(format)
         {
         case GL_DEPTH24_STENCIL8_OES:
+            return PF_DEPTH24_STENCIL8;
         case GL_DEPTH_COMPONENT24_OES:
-        case GL_DEPTH_COMPONENT32_OES:
         case GL_DEPTH_COMPONENT16:
         case GL_DEPTH_COMPONENT:
             return PF_DEPTH16;
+        case GL_DEPTH32F_STENCIL8:
+            return PF_DEPTH32F;
+        case GL_DEPTH_COMPONENT32F:
+            return PF_DEPTH32F;
         case GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR:
         case GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR:
         case GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR:
