@@ -132,8 +132,8 @@ namespace Ogre
         /// Returns number of matrices written to transform, assumes transform has enough space
         size_t getTransforms( Matrix4 *xform ) const;
         /// Returns number of 32-bit values written
-        size_t getTransforms3x4( Matrix3x4f *xform ) const noexcept;
-        size_t getTransforms3x4( Matrix3x4f *xform, bool isVisible ) const noexcept;
+        size_t getTransforms3x4( Matrix3x4f *xform ) const;
+        size_t getTransforms3x4( Matrix3x4f *xform, bool isVisible, bool useBoneWorldMatrices ) const noexcept;
 
         /// Returns true if this InstancedObject is visible to the current camera
         bool findVisible( Camera *camera ) const;
@@ -257,14 +257,14 @@ namespace Ogre
         void setInUse(bool used);
 
         /** Returns the world transform of the instanced entity including local transform */
-        virtual const Affine3& _getParentNodeFullTransform(void) const {
+        virtual const Affine3& _getParentNodeFullTransform(void) const noexcept {
             assert((!mNeedTransformUpdate || !mUseLocalTransform) && "Transform data should be updated at this point");
             return mUseLocalTransform ? mFullLocalTransform :
                 mParentNode ? mParentNode->_getFullTransform() : Affine3::IDENTITY;
         }
 
         /** Returns the derived position of the instanced entity including local transform */
-        const Vector3& _getDerivedPosition() const {
+        const Vector3& _getDerivedPosition() const noexcept {
             assert((!mNeedTransformUpdate || !mUseLocalTransform) && "Transform data should be updated at this point");
             return mUseLocalTransform ? mDerivedLocalPosition :
                 mParentNode ? mParentNode->_getDerivedPosition() : Vector3::ZERO;
