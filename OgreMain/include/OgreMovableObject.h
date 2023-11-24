@@ -382,7 +382,7 @@ namespace Ogre {
         uint8 getRenderQueueGroup(void) const { return mRenderQueueID; }
 
         /// Return the full transformation of the parent sceneNode or the attachingPoint node
-        virtual const Affine3& _getParentNodeFullTransform(void) const;
+        virtual const Affine3& _getParentNodeFullTransform(void) const noexcept;
 
         /** Sets the query flags for this object.
 
