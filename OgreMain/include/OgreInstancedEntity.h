@@ -132,7 +132,8 @@ namespace Ogre
         /// Returns number of matrices written to transform, assumes transform has enough space
         size_t getTransforms( Matrix4 *xform ) const;
         /// Returns number of 32-bit values written
-        size_t getTransforms3x4( Matrix3x4f *xform ) const;
+        size_t getTransforms3x4( Matrix3x4f *xform ) const noexcept;
+        size_t getTransforms3x4( Matrix3x4f *xform, bool isVisible ) const noexcept;
 
         /// Returns true if this InstancedObject is visible to the current camera
         bool findVisible( Camera *camera ) const;
@@ -245,7 +246,7 @@ namespace Ogre
         void setScale(const Vector3& scale, bool doUpdate = true);
 
         /** Returns the maximum derived scale coefficient among the xyz values */
-        Real getMaxScaleCoef() const;
+        Real getMaxScaleCoef() const noexcept;
 
         /** Update the world transform and derived values */
         void updateTransforms();
