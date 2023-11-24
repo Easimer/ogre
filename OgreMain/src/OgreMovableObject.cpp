@@ -262,7 +262,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    const Affine3& MovableObject::_getParentNodeFullTransform(void) const
+    const Affine3& MovableObject::_getParentNodeFullTransform(void) const noexcept
     {
         
         if(mParentNode)

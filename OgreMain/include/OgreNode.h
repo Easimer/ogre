@@ -167,7 +167,7 @@ namespace Ogre {
             to update it's complete transformation based on it's parents
             derived transform.
         */
-        void _updateFromParent(void) const;
+        void _updateFromParent(void) const noexcept;
 
         /** Class-specific implementation of _updateFromParent.
 
@@ -523,7 +523,7 @@ namespace Ogre {
 
         /** Gets the position of the node as derived from all parents.
         */
-        const Vector3 & _getDerivedPosition(void) const;
+        const Vector3 & _getDerivedPosition(void) const noexcept;
 
         /** Gets the scaling factor of the node as derived from all parents.
         */
@@ -538,7 +538,7 @@ namespace Ogre {
             derived transforms have been updated before calling this method.
             Applications using Ogre should just use the relative transforms.
         */
-        const Affine3& _getFullTransform(void) const;
+        const Affine3& _getFullTransform(void) const noexcept;
 
         /** Internal method to update the Node.
         @note

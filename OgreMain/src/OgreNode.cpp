@@ -108,7 +108,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    const Affine3& Node::_getFullTransform(void) const
+    const Affine3& Node::_getFullTransform(void) const noexcept
     {
         if (mCachedTransformOutOfDate)
         {
@@ -194,14 +194,20 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void Node::_updateFromParent(void) const
+    void Node::_updateFromParent(void) const noexcept
     {
         updateFromParentImpl();
 
         // Call listener (note, this method only called if there's something to do)
         if (mListener)
         {
-            mListener->nodeUpdated(this);
+            try
+            {
+                mListener->nodeUpdated(this);
+            }
+            catch (...)
+            {
+            }
         }
     }
     //-----------------------------------------------------------------------
@@ -461,7 +467,7 @@ namespace Ogre {
         return mDerivedOrientation;
     }
     //-----------------------------------------------------------------------
-    const Vector3 & Node::_getDerivedPosition(void) const
+    const Vector3 & Node::_getDerivedPosition(void) const noexcept
     {
         if (mNeedParentUpdate)
         {

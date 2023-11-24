@@ -191,14 +191,14 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------
-    size_t InstancedEntity::getTransforms3x4( Matrix3x4f *xform, bool isVisible ) const noexcept {
+    size_t InstancedEntity::getTransforms3x4( Matrix3x4f *xform, bool isVisible, bool useBoneWorldMatrices ) const noexcept {
         size_t retVal;
         //When not attached, returns zero matrix to avoid rendering this one, not identity
         if( isVisible )
         {
             if( !mSkeletonInstance )
             {
-                const Affine3& mat = mBatchOwner->useBoneWorldMatrices() ?
+                const Affine3& mat = useBoneWorldMatrices ?
                     _getParentNodeFullTransform() : Affine3::IDENTITY;
 
                 *xform = Matrix3x4f(mat[0]);
@@ -206,7 +206,7 @@ namespace Ogre
             }
             else
             {
-                Affine3* matrices = mBatchOwner->useBoneWorldMatrices() ? mBoneWorldMatrices : mBoneMatrices;
+                Affine3* matrices = useBoneWorldMatrices ? mBoneWorldMatrices : mBoneMatrices;
                 const Mesh::IndexMap *indexMap = mBatchOwner->_getIndexToBoneMap();
                 
                 for(auto i : *indexMap)
@@ -230,9 +230,10 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------
-    size_t InstancedEntity::getTransforms3x4( Matrix3x4f *xform ) const noexcept
+    size_t InstancedEntity::getTransforms3x4( Matrix3x4f *xform ) const
     {
-        return getTransforms3x4(xform, isVisible() && isInScene());
+        bool useBoneWorldMatrices = mBatchOwner->useBoneWorldMatrices();
+        return getTransforms3x4(xform, isVisible() && isInScene(), useBoneWorldMatrices);
     }
     //-----------------------------------------------------------------------
     bool InstancedEntity::findVisible( Camera *camera ) const
