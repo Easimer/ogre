@@ -142,38 +142,106 @@ namespace Ogre
     //-----------------------------------------------------------------------
     size_t InstanceBatchHW::updateVertexBuffer( Camera *currentCamera )
     {
-        size_t retVal = 0;
+        const uint numEntities = mInstancedEntities.size();
+        InstancedEntityVec visibleEntities;
+        visibleEntities.reserve(numEntities);
+        // NOTE(danielm): each entity uses the same mesh, so we only need to
+        // query the bounding sphere radius once
+        float boundingRadius = _getMeshReference()->getBoundingSphereRadius();
+        const Plane *arrFrustumPlanes = currentCamera->getFrustumPlanes();
+        const bool isFarInfinite = currentCamera->getFarClipDistance() == 0.0f;
 
-        //Now lock the vertex buffer and copy the 4x3 matrices, only those who need it!
-        VertexBufferBinding* binding = mRenderOperation.vertexData->vertexBufferBinding; 
-        const ushort bufferIdx = ushort(binding->getBufferCount()-1);
-        HardwareBufferLockGuard vertexLock(binding->getBuffer(bufferIdx), HardwareBuffer::HBL_DISCARD);
-        float *pDest = static_cast<float*>(vertexLock.pData);
-        unsigned char numCustomParams           = mCreator->getNumCustomParams();
-        size_t customParamIdx                   = 0;
-
-        for (auto *e : mInstancedEntities)
+        for (uint32_t idxEntity = 0; idxEntity < numEntities; idxEntity++)
         {
-            //Cull on an individual basis, the less entities are visible, the less instances we draw.
-            //No need to use null matrices at all!
-            if (e->findVisible(currentCamera ))
+            InstancedEntity *ent = mInstancedEntities[idxEntity];
+            // Cull on an individual basis, the less entities are visible, the less instances we draw.
+            // No need to use null matrices at all!
+            if (!ent->isVisible())
             {
-                const size_t floatsWritten = e->getTransforms3x4( (Matrix3x4f*)pDest);
+                continue;
+            }
 
-                if( mManager->getCameraRelativeRendering() )
-                    makeMatrixCameraRelative3x4((Matrix3x4f*)pDest, floatsWritten / 12);
+            float entBoundRadius = boundingRadius * ent->getMaxScaleCoef();
+            Vector3 center = ent->_getDerivedPosition();
 
+            bool isVisible = true;
+            for (int idxPlane = 0; idxPlane < 6; ++idxPlane)
+            {
+                // Skip far plane if infinite view frustum
+                if (isFarInfinite && idxPlane == FRUSTUM_PLANE_FAR)
+                    continue;
+
+                // If the distance from sphere center to plane is negative, and 'more negative'
+                // than the radius of the sphere, sphere is outside frustum
+                if (arrFrustumPlanes[idxPlane].getDistance(center) < -entBoundRadius)
+                {
+                    // ALL corners on negative side therefore out of view
+                    isVisible = false;
+                    break;
+                }
+            }
+
+            if (!isVisible)
+            {
+                continue;
+            }
+
+            visibleEntities.push_back(ent);
+        }
+
+        if (visibleEntities.empty())
+        {
+            return 0;
+        }
+
+        // NOTE(danielm): defer locking this buffer until we determine that we
+        // do have instances to render
+
+        // Now lock the vertex buffer and copy the 4x3 matrices, only those who need it!
+        VertexBufferBinding *binding = mRenderOperation.vertexData->vertexBufferBinding;
+        const ushort bufferIdx = ushort(binding->getBufferCount() - 1);
+        HardwareBufferLockGuard vertexLock(binding->getBuffer(bufferIdx), HardwareBuffer::HBL_DISCARD);
+        float *pDest = static_cast<float *>(vertexLock.pData);
+
+
+        size_t retVal = visibleEntities.size();
+        bool isCameraRelativeRendering = mManager->getCameraRelativeRendering();
+
+        unsigned char numCustomParams = mCreator->getNumCustomParams();
+
+        if (numCustomParams != 0)
+        {
+            size_t customParamIdx = 0;
+            for (uint32_t idxEntity = 0; idxEntity < retVal; idxEntity++)
+            {
+                InstancedEntity *ent = visibleEntities[idxEntity];
+                const size_t floatsWritten = ent->getTransforms3x4((Matrix3x4f *)pDest, true);
+                if (isCameraRelativeRendering)
+                    makeMatrixCameraRelative3x4((Matrix3x4f *)pDest, floatsWritten / 12);
                 pDest += floatsWritten;
 
-                //Write custom parameters, if any
+                // Write custom parameters, if any
                 for (unsigned char i = 0; i < numCustomParams; ++i)
                 {
-                    memcpy(pDest, mCustomParams[customParamIdx+i].ptr(), sizeof(Vector4f));
-                    pDest += 4;
+                    *pDest++ = mCustomParams[customParamIdx + i].x;
+                    *pDest++ = mCustomParams[customParamIdx + i].y;
+                    *pDest++ = mCustomParams[customParamIdx + i].z;
+                    *pDest++ = mCustomParams[customParamIdx + i].w;
                 }
-                ++retVal;
+
+                customParamIdx += numCustomParams;
             }
-            customParamIdx += numCustomParams;
+        }
+        else
+        {
+            for (uint32_t idxEntity = 0; idxEntity < retVal; idxEntity++)
+            {
+                InstancedEntity *ent = visibleEntities[idxEntity];
+                const size_t floatsWritten = ent->getTransforms3x4((Matrix3x4f *)pDest, true);
+                if (isCameraRelativeRendering)
+                    makeMatrixCameraRelative3x4((Matrix3x4f *)pDest, floatsWritten / 12);
+                pDest += floatsWritten;
+            }
         }
 
         return retVal;
