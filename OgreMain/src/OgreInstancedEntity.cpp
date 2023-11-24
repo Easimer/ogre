@@ -191,11 +191,10 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------
-    size_t InstancedEntity::getTransforms3x4( Matrix3x4f *xform ) const
-    {
+    size_t InstancedEntity::getTransforms3x4( Matrix3x4f *xform, bool isVisible ) const noexcept {
         size_t retVal;
         //When not attached, returns zero matrix to avoid rendering this one, not identity
-        if( isVisible() && isInScene() )
+        if( isVisible )
         {
             if( !mSkeletonInstance )
             {
@@ -229,6 +228,11 @@ namespace Ogre
         }
 
         return retVal;
+    }
+    //-----------------------------------------------------------------------
+    size_t InstancedEntity::getTransforms3x4( Matrix3x4f *xform ) const noexcept
+    {
+        return getTransforms3x4(xform, isVisible() && isInScene());
     }
     //-----------------------------------------------------------------------
     bool InstancedEntity::findVisible( Camera *camera ) const
@@ -463,7 +467,7 @@ namespace Ogre
     } 
 
     //---------------------------------------------------------------------------
-    Real InstancedEntity::getMaxScaleCoef() const 
+    Real InstancedEntity::getMaxScaleCoef() const noexcept
     { 
         return mMaxScaleLocal;
     }
