@@ -157,7 +157,7 @@ namespace Ogre
             InstancedEntity *ent = mInstancedEntities[idxEntity];
             // Cull on an individual basis, the less entities are visible, the less instances we draw.
             // No need to use null matrices at all!
-            if (!ent->isVisible())
+            if (!ent->getVisible())
             {
                 continue;
             }
@@ -209,6 +209,7 @@ namespace Ogre
         bool isCameraRelativeRendering = mManager->getCameraRelativeRendering();
 
         unsigned char numCustomParams = mCreator->getNumCustomParams();
+        bool shouldUseBoneWorldMatrices = useBoneWorldMatrices();
 
         if (numCustomParams != 0)
         {
@@ -216,7 +217,7 @@ namespace Ogre
             for (uint32_t idxEntity = 0; idxEntity < retVal; idxEntity++)
             {
                 InstancedEntity *ent = visibleEntities[idxEntity];
-                const size_t floatsWritten = ent->getTransforms3x4((Matrix3x4f *)pDest, true);
+                const size_t floatsWritten = ent->getTransforms3x4((Matrix3x4f *)pDest, true, shouldUseBoneWorldMatrices);
                 if (isCameraRelativeRendering)
                     makeMatrixCameraRelative3x4((Matrix3x4f *)pDest, floatsWritten / 12);
                 pDest += floatsWritten;
@@ -238,7 +239,7 @@ namespace Ogre
             for (uint32_t idxEntity = 0; idxEntity < retVal; idxEntity++)
             {
                 InstancedEntity *ent = visibleEntities[idxEntity];
-                const size_t floatsWritten = ent->getTransforms3x4((Matrix3x4f *)pDest, true);
+                const size_t floatsWritten = ent->getTransforms3x4((Matrix3x4f *)pDest, true, shouldUseBoneWorldMatrices);
                 if (isCameraRelativeRendering)
                     makeMatrixCameraRelative3x4((Matrix3x4f *)pDest, floatsWritten / 12);
                 pDest += floatsWritten;
