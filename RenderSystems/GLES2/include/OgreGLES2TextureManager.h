@@ -35,6 +35,17 @@ THE SOFTWARE.
 #include "OgreGLNativeSupport.h"
 
 namespace Ogre {
+    class _OgreGLES2Export WebGL2Sampler : public Sampler
+    {
+    public:
+        WebGL2Sampler(bool supportsAnisotropy);
+        ~WebGL2Sampler();
+        void bind(GLuint unit);
+
+    private:
+        GLuint mHandle;
+        bool mSupportsAnisotropy;
+    };
     /** GL ES-specific implementation of a TextureManager */
     class _OgreGLES2Export GLES2TextureManager : public TextureManager
     {
@@ -48,6 +59,7 @@ namespace Ogre {
             /// @copydoc TextureManager::isHardwareFilteringSupported
             bool isHardwareFilteringSupported(TextureType ttype, PixelFormat format, int usage,
                                               bool preciseFormatOnly = false) override;
+            SamplerPtr _createSamplerImpl() override;
     protected:
         friend class GLES2RenderSystem;
         
