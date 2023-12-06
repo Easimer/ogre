@@ -203,6 +203,7 @@ namespace Ogre {
 
         OGRE_CHECK_GL_ERROR(glCompileShader(mGLShaderHandle));
 
+#if 0
         // Check for compile errors
         int compiled;
         OGRE_CHECK_GL_ERROR(glGetShaderiv(mGLShaderHandle, GL_COMPILE_STATUS, &compiled));
@@ -215,6 +216,7 @@ namespace Ogre {
         // probably we have warnings
         if (!compileInfo.empty())
             LogManager::getSingleton().stream(LML_WARNING) << getResourceLogName() << " " << compileInfo;
+#endif
     }
 
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER   
