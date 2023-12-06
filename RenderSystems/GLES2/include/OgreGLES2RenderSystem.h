@@ -172,11 +172,6 @@ namespace Ogre {
 
             void setStencilState(const StencilState& state) override;
 
-            virtual void _setTextureUnitFiltering(size_t unit, FilterOptions minFilter,
-                FilterOptions magFilter, FilterOptions mipFilter);              
-
-            void _setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions filter);
-
             void _render(const RenderOperation& op);
 
             void setScissorTest(bool enabled, const Rect& rect = Rect());
