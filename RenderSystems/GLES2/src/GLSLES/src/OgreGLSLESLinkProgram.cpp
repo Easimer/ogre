@@ -133,25 +133,17 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glLinkProgram( mGLProgramHandle ));
         OGRE_CHECK_GL_ERROR(glGetProgramiv( mGLProgramHandle, GL_LINK_STATUS, &mLinked ));
 
-        GLSLES::logObjectInfo( getCombinedName() + String("GLSL link result : "), mGLProgramHandle );
-
-        const RenderSystemCapabilities* caps = Root::getSingleton().getRenderSystem()->getCapabilities();
-
-        if(caps->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
-        {
-            if(glIsProgramPipelineEXT(mGLProgramHandle))
-                glValidateProgramPipelineEXT(mGLProgramHandle);
-        }
-        else if(glIsProgram(mGLProgramHandle))
-        {
-            glValidateProgram(mGLProgramHandle);
-        }
-
-        GLSLES::logObjectInfo( getCombinedName() + String(" GLSL validation result : "), mGLProgramHandle );
-
         if(mLinked)
         {
             _writeToCache(hash, mGLProgramHandle);
+        }
+        else
+        {
+            String linkInfo = GLSLES::getObjectInfo(mGLProgramHandle);
+            String vsInfo = GLSLES::getObjectInfo(mShaders[GPT_VERTEX_PROGRAM]->getShaderID());
+            String fsInfo = GLSLES::getObjectInfo(mShaders[GPT_FRAGMENT_PROGRAM]->getShaderID());
+
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, linkInfo + " " + vsInfo + " " + fsInfo, "compile");
         }
     }
 
