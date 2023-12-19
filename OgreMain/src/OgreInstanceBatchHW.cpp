@@ -154,9 +154,11 @@ namespace Ogre
         for (uint32_t idxEntity = 0; idxEntity < numEntities; idxEntity++)
         {
             InstancedEntity *ent = mInstancedEntities[idxEntity];
-            // Cull on an individual basis, the less entities are visible, the less instances we draw.
-            // No need to use null matrices at all!
-            if (!ent->getVisible())
+            if (!ent->mInUse)
+            {
+                continue;
+            }
+            if (!ent->mVisible)
             {
                 continue;
             }
@@ -210,7 +212,7 @@ namespace Ogre
         unsigned char numCustomParams = mCreator->getNumCustomParams();
         bool shouldUseBoneWorldMatrices = useBoneWorldMatrices();
 
-        if (numCustomParams != 0)
+        if (numCustomParams != 0 || isCameraRelativeRendering)
         {
             size_t customParamIdx = 0;
             for (uint32_t idxEntity = 0; idxEntity < retVal; idxEntity++)
@@ -239,8 +241,6 @@ namespace Ogre
             {
                 InstancedEntity *ent = visibleEntities[idxEntity];
                 const size_t floatsWritten = ent->getTransforms3x4((Matrix3x4f *)pDest, true, shouldUseBoneWorldMatrices);
-                if (isCameraRelativeRendering)
-                    makeMatrixCameraRelative3x4((Matrix3x4f *)pDest, floatsWritten / 12);
                 pDest += floatsWritten;
             }
         }
