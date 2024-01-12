@@ -148,8 +148,13 @@ namespace Ogre
         // NOTE(danielm): each entity uses the same mesh, so we only need to
         // query the bounding sphere radius once
         float boundingRadius = _getMeshReference()->getBoundingSphereRadius();
-        const Plane *arrFrustumPlanes = currentCamera->getFrustumPlanes();
-        const bool isFarInfinite = currentCamera->getFarClipDistance() == 0.0f;
+        const Plane* arrFrustumPlanes = nullptr;
+        bool isFarInfinite = false;
+        if (currentCamera)
+        {
+            arrFrustumPlanes = currentCamera->getFrustumPlanes();
+            isFarInfinite = currentCamera->getFarClipDistance() == 0.0f;
+        }
 
         for (uint32_t idxEntity = 0; idxEntity < numEntities; idxEntity++)
         {
@@ -160,6 +165,11 @@ namespace Ogre
             }
             if (!ent->mVisible)
             {
+                continue;
+            }
+            if (arrFrustumPlanes == nullptr)
+            {
+                visibleEntities.push_back(ent);
                 continue;
             }
 
