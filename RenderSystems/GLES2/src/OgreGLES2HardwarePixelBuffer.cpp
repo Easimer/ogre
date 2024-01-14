@@ -320,6 +320,21 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &tempFBO));
         OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, tempFBO));
 
+        auto type = GLES2PixelUtil::getGLOriginDataType(data.format);
+        if (type == GL_FLOAT && getGLES2RenderSystem()->getCapabilities()->hasCapability(RSC_TEXTURE_FLOAT))
+        {
+            auto format = GLES2PixelUtil::getGLOriginFormat(data.format);
+            OGRE_CHECK_GL_ERROR(
+                glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mTextureID, 0));
+            OGRE_CHECK_GL_ERROR(glCheckFramebufferStatus(GL_FRAMEBUFFER));
+            OGRE_CHECK_GL_ERROR(glReadPixels(0, 0, data.getWidth(), data.getHeight(), format, type, data.data));
+            // Restore defaults
+            OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 4));
+            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, currentFBO));
+            OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &tempFBO));
+            return;
+        }
+
         // Construct a temp PixelBox that is RGBA because GL_RGBA/GL_UNSIGNED_BYTE is the only combination that is
         // guaranteed to work on all platforms.
         size_t sizeInBytes = PixelUtil::getMemorySize(data.getWidth(), data.getHeight(), data.getDepth(), PF_A8B8G8R8);
