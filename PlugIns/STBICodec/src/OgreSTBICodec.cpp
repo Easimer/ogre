@@ -170,14 +170,48 @@ namespace Ogre {
         String contents = input->getAsString();
 
         int width, height, components;
-        stbi_uc* pixelData = stbi_load_from_memory((const uchar*)contents.data(),
-                static_cast<int>(contents.size()), &width, &height, &components, 0);
+        if (stbi_is_hdr_from_memory((const uchar*)contents.data(), static_cast<int>(contents.size())))
+        {
+            float* pixelData = stbi_loadf_from_memory((const uchar*)contents.data(), static_cast<int>(contents.size()),
+                                                      &width, &height, &components, 0);
+            if (!pixelData)
+            {
+                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Error decoding image: " + String(stbi_failure_reason()),
+                            "STBIImageCodec::decode");
+            }
+
+            PixelFormat format = PF_UNKNOWN;
+            switch (components)
+            {
+            case 1:
+                format = PF_FLOAT32_R;
+                break;
+            case 2:
+                format = PF_FLOAT32_GR;
+                break;
+            case 3:
+                format = PF_FLOAT32_RGB;
+                break;
+            case 4:
+                format = PF_FLOAT32_RGBA;
+                break;
+            default:
+                stbi_image_free(pixelData);
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Only 1..4 channels supported");
+                break;
+            }
+
+            image->loadDynamicImage((uchar*)pixelData, width, height, 1, format, true);
+            return;
+        }
+
+        stbi_uc* pixelData = stbi_load_from_memory((const uchar*)contents.data(), static_cast<int>(contents.size()),
+                                                   &width, &height, &components, 0);
 
         if (!pixelData)
         {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-                "Error decoding image: " + String(stbi_failure_reason()),
-                "STBIImageCodec::decode");
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Error decoding image: " + String(stbi_failure_reason()),
+                        "STBIImageCodec::decode");
         }
 
         PixelFormat format = PF_UNKNOWN;
