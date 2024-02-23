@@ -351,6 +351,16 @@ namespace Ogre {
         case GL_COMPRESSED_RGBA_ASTC_12x10_KHR:
         case GL_COMPRESSED_RGBA_ASTC_12x12_KHR:
             return ret + 0x20; // ASTC SRGBA format offset
+// MaxWhere start
+        case GL_COMPRESSED_RGBA_BPTC_UNORM_EXT:
+            return GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM_EXT;
+        case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:
+            return GL_COMPRESSED_SRGB_S3TC_DXT1_EXT;
+        case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:
+            return GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT;
+        case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
+            return GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT;
+// MaxWhere end
         default:
             return ret;
         }
