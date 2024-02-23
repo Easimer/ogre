@@ -202,12 +202,23 @@ namespace Ogre {
 
         if (PixelUtil::isCompressed(data.format))
         {
-            if(data.format != mFormat || !data.isConsecutive())
-                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                            "Compressed images must be consecutive, in the source format",
+            if (data.format != mFormat || !data.isConsecutive())
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Compressed images must be consecutive, in the source format",
                             "GLES2TextureBuffer::upload");
 
+            // NOTE(danielm): originally Ogre always specified the non-sRGB
+            // version of the image format here, even if the GL texture was
+            // created with an sRGB type (e.g. linear DXT1 when the texture has
+            // sRGB DXT1 internal format). However, the GLES 3.0.6 spec's
+            // section 3.8.6 specifies that glCompressedTexSubImage2D doesn't
+            // provide for image format conversion and it will generate an
+            // INVALID_OPERATION error if the specified `format` doesn't match
+            // the image's internal format.
+#if 0
             GLenum format = GLES2PixelUtil::getGLInternalFormat(mFormat);
+#else
+            GLenum format = mGLInternalFormat;
+#endif
             // Data must be consecutive and at beginning of buffer as PixelStorei not allowed
             // for compressed formats
             switch(mTarget) {
