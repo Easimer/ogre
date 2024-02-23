@@ -132,7 +132,6 @@ namespace Ogre {
             {GL_RGB_INTEGER, GL_INT, GL_RGB32I},                 // PF_R32G32B32_SINT
             {GL_RGBA_INTEGER, GL_INT, GL_RGBA32I},               // PF_R32G32B32A32_SINT
             {GL_RGB, GL_UNSIGNED_INT_5_9_9_9_REV, GL_RGB9_E5},   // PF_R9G9B9E5_SHAREDEXP
-#if OGRE_GLES2_ANGLE
             {GL_NONE, GL_NONE, GL_COMPRESSED_RED_RGTC1_EXT},               // PF_BC4_UNORM
             {GL_NONE, GL_NONE, GL_COMPRESSED_SIGNED_RED_RGTC1_EXT},        // PF_BC4_SNORM
             {GL_NONE, GL_NONE, GL_COMPRESSED_RED_GREEN_RGTC2_EXT},         // PF_BC5_UNORM
@@ -140,15 +139,6 @@ namespace Ogre {
             {GL_NONE, GL_NONE, GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT_EXT}, // PF_BC6H_UF16
             {GL_NONE, GL_NONE, GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT_EXT},   // PF_BC6H_SF16
             {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_BPTC_UNORM_EXT},         // PF_BC7_UNORM
-#else
-            {GL_NONE},                                           // PF_BC4_UNORM
-            {GL_NONE},                                           // PF_BC4_SNORM
-            {GL_NONE},                                           // PF_BC5_UNORM
-            {GL_NONE},                                           // PF_BC5_SNORM
-            {GL_NONE},                                           // PF_BC6H_UF16
-            {GL_NONE},                                           // PF_BC6H_SF16
-            {GL_NONE},                                           // PF_BC7_UNORM
-#endif
             {GL_RED_EXT, GL_UNSIGNED_BYTE, GL_R8_EXT},           // PF_R8
             {GL_RG_EXT, GL_UNSIGNED_BYTE, GL_RG8_EXT},           // PF_RG8
             {GL_RED, GL_UNSIGNED_BYTE, GL_R8_SNORM},             // PF_R8_SNORM
@@ -246,7 +236,6 @@ namespace Ogre {
             {GL_NONE},                                           // PF_R32G32B32_SINT
             {GL_NONE},                                           // PF_R32G32B32A32_SINT
             {GL_NONE},                                           // PF_R9G9B9E5_SHAREDEXP
-#if OGRE_GLES2_ANGLE
             {GL_NONE, GL_NONE, GL_COMPRESSED_RED_RGTC1_EXT},               // PF_BC4_UNORM
             {GL_NONE, GL_NONE, GL_COMPRESSED_SIGNED_RED_RGTC1_EXT},        // PF_BC4_SNORM
             {GL_NONE, GL_NONE, GL_COMPRESSED_RED_GREEN_RGTC2_EXT},         // PF_BC5_UNORM
@@ -254,15 +243,6 @@ namespace Ogre {
             {GL_NONE, GL_NONE, GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT_EXT}, // PF_BC6H_UF16
             {GL_NONE, GL_NONE, GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT_EXT},   // PF_BC6H_SF16
             {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_BPTC_UNORM_EXT},         // PF_BC7_UNORM
-#else
-            {GL_NONE},                                           // PF_BC4_UNORM
-            {GL_NONE},                                           // PF_BC4_SNORM
-            {GL_NONE},                                           // PF_BC5_UNORM
-            {GL_NONE},                                           // PF_BC5_SNORM
-            {GL_NONE},                                           // PF_BC6H_UF16
-            {GL_NONE},                                           // PF_BC6H_SF16
-            {GL_NONE},                                           // PF_BC7_UNORM
-#endif
             {GL_RED_EXT, GL_UNSIGNED_BYTE, GL_RED_EXT},          // PF_R8
             {GL_RG_EXT, GL_UNSIGNED_BYTE, GL_RG_EXT},            // PF_RG8
             {GL_NONE},                                           // PF_R8_SNORM
