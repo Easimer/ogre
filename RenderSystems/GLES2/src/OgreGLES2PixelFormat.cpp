@@ -72,7 +72,7 @@ namespace Ogre {
             {GL_NONE},                                           // PF_B8G8R8A8
 #endif
             {GL_NONE},                                                       // PF_A2R10G10B10
-            {GL_RGBA_INTEGER, GL_UNSIGNED_INT_2_10_10_10_REV, GL_RGB10_A2UI},// PF_A2B10G10R10
+            {GL_RGBA, GL_UNSIGNED_INT_2_10_10_10_REV, GL_RGB10_A2},// PF_A2B10G10R10
             {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_S3TC_DXT1_EXT},// PF_DXT1
             {GL_NONE},                                           // PF_DXT2
             {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_S3TC_DXT3_EXT},// PF_DXT3
