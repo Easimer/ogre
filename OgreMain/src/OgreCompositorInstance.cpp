@@ -158,7 +158,8 @@ public:
       mQuadCornerModified(false),
       mQuadFarCorners(false),
       mQuadFarCornersViewSpace(false),
-      mQuad(-1, 1, 1, -1)
+      mQuad(-1, 1, 1, -1),
+      mRect(true, HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE)
     {
         instance->_fireNotifyMaterialSetup(pass_id, mat);
         technique = mat->getBestTechnique();
@@ -171,6 +172,7 @@ public:
 
     bool mQuadCornerModified, mQuadFarCorners, mQuadFarCornersViewSpace;
     FloatRect mQuad;
+    Rectangle2D mRect;
 
     void setQuadCorners(const FloatRect& quad)
     {
@@ -190,14 +192,13 @@ public:
         instance->_fireNotifyMaterialRender(pass_id, mat);
 
         Viewport* vp = rs->_getViewport();
-        Rectangle2D *rect = static_cast<Rectangle2D*>(CompositorManager::getSingleton()._getTexturedRectangle2D());
 
         if (mQuadCornerModified)
         {
             // insure positions are using peculiar render system offsets 
             Real hOffset = rs->getHorizontalTexelOffset() / (0.5f * vp->getActualWidth());
             Real vOffset = rs->getVerticalTexelOffset() / (0.5f * vp->getActualHeight());
-            rect->setCorners(mQuad.left + hOffset, mQuad.top - vOffset, mQuad.right + hOffset, mQuad.bottom - vOffset);
+            mRect.setCorners(mQuad.left + hOffset, mQuad.top - vOffset, mQuad.right + hOffset, mQuad.bottom - vOffset);
         }
 
         if(mQuadFarCorners)
@@ -206,11 +207,11 @@ public:
             if(mQuadFarCornersViewSpace)
             {
                 const Affine3 &viewMat = vp->getCamera()->getViewMatrix(true);
-                rect->setNormals(viewMat*corners[5], viewMat*corners[6], viewMat*corners[4], viewMat*corners[7]);
+                mRect.setNormals(viewMat*corners[5], viewMat*corners[6], viewMat*corners[4], viewMat*corners[7]);
             }
             else
             {
-                rect->setNormals(corners[5], corners[6], corners[4], corners[7]);
+                mRect.setNormals(corners[5], corners[6], corners[4], corners[7]);
             }
         }
 
@@ -219,7 +220,7 @@ public:
         {
             sm->_injectRenderWithPass(
                 p,
-                rect,
+                &mRect,
                 false // don't allow replacement of shadow passes
                 );
         }
